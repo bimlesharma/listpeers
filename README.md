@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PeerList - Student Academic Analytics Platform
+
+A privacy-first, consent-driven academic analytics platform built with Next.js 16, TypeScript, Tailwind CSS, and Supabase.
+
+## Features
+
+- 🔐 **Privacy First**: Row Level Security, consent management, and tiered visibility
+- 📊 **Deep Analytics**: SGPA/CGPA trends, grade distributions, credit-weighted insights
+- 🏆 **Optional Rankboard**: Opt-in peer comparison with anonymous mode by default
+- 📱 **Responsive Design**: Works on all devices with dark/light theme support
+- 📝 **Self-Submitted Data**: Students voluntarily submit their own academic data
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS 4 |
+| Charts | Recharts |
+| Backend | Supabase (PostgreSQL + Auth) |
+| Authentication | GitHub OAuth |
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone and Install
+
+```bash
+cd peerlist
+npm install
+```
+
+### 2. Setup Supabase
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to **Authentication > Providers** and enable **GitHub**
+3. Create GitHub OAuth App:
+   - Go to [github.com/settings/developers](https://github.com/settings/developers)
+   - Click **New OAuth App**
+   - Set **Homepage URL**: `http://localhost:3000`
+   - Set **Callback URL**: `https://YOUR-PROJECT.supabase.co/auth/v1/callback`
+   - Copy **Client ID** and **Client Secret** to Supabase
+4. Go to **SQL Editor** and run the contents of `supabase/schema.sql`
+5. Copy your project URL and anon key from **Settings > API**
+
+### 3. Configure Environment
+
+Create `.env.local` from the example:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Edit `.env.local` and add your Supabase credentials:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── page.tsx                 # Landing page with Google sign-in
+│   ├── onboarding/              # First-time user setup
+│   ├── auth/callback/           # OAuth callback handler
+│   └── (authenticated)/         # Protected routes
+│       ├── dashboard/           # Analytics dashboard
+│       ├── submit/              # Academic data entry
+│       ├── records/             # View/manage submissions
+│       ├── rankboard/           # Peer comparison
+│       └── settings/            # Consent management
+├── components/
+│   ├── Charts/                  # Recharts components
+│   ├── Navbar.tsx               # Navigation
+│   ├── ThemeProvider.tsx        # Dark/light mode
+│   └── DisclaimerFooter.tsx     # Legal disclaimer
+├── lib/
+│   ├── supabase/                # Supabase clients
+│   ├── grading.ts               # SGPA/CGPA calculations
+│   └── utils.ts                 # Utility functions
+└── types/
+    └── index.ts                 # TypeScript interfaces
+```
 
-## Learn More
+## Security Features
 
-To learn more about Next.js, take a look at the following resources:
+- **Row Level Security (RLS)**: Users can only access their own data
+- **Enrollment Uniqueness**: Prevents duplicate registrations
+- **Consent Audit Logging**: All consent changes are logged with timestamps
+- **Tiered Visibility**: Anonymous by default, explicit opt-in for visibility
+- **Marks Visibility Confirmation**: Extra confirmation required to share detailed marks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Disclaimer
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is an independent, student-driven platform. It is not affiliated with or endorsed by any university. All data is voluntarily submitted by students. Rankboards are generated solely from self-submitted data and do not represent official academic rankings.

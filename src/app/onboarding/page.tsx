@@ -1,0 +1,667 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { DisclaimerFooter } from '@/components/DisclaimerFooter';
+import { hashPassword } from '@/lib/crypto';
+import { marksToGrade, marksToGradePoint } from '@/lib/grading';
+import { getSubjectCredits } from '@/data/subjectCredits';
+import type { IPUResult, CaptchaResponse, LoginResponse, IPUResultsResponse } from '@/types/ipu';
+import {
+    GraduationCap,
+    CheckCircle2,
+    AlertCircle,
+    Loader2,
+    RefreshCw,
+    ShieldCheck,
+    ArrowRight,
+    Download,
+} from 'lucide-react';
+
+type Step = 'ipu-login' | 'fetching' | 'review' | 'consent';
+
+interface SemesterData {
+    semester: number;
+    subjects: IPUResult[];
+}
+
+export default function OnboardingPage() {
+    const router = useRouter();
+    const supabase = createClient();
+
+    // Step state
+    const [step, setStep] = useState<Step>('ipu-login');
+
+    // IPU login state
+    const [enrollmentNo, setEnrollmentNo] = useState('');
+    const [password, setPassword] = useState('');
+    const [captchaInput, setCaptchaInput] = useState('');
+    const [captchaImage, setCaptchaImage] = useState('');
+    const [sessionId, setSessionId] = useState('');
+
+    // Fetched data state
+    const [studentName, setStudentName] = useState('');
+    const [studentInstitute, setStudentInstitute] = useState('');
+    const [studentProgram, setStudentProgram] = useState('');
+    const [studentBatch, setStudentBatch] = useState('');
+    const [semesterResults, setSemesterResults] = useState<SemesterData[]>([]);
+
+    // Consent state
+    const [consentAnalytics, setConsentAnalytics] = useState(true);
+    const [consentRankboard, setConsentRankboard] = useState(false);
+    const [acknowledgeVoluntary, setAcknowledgeVoluntary] = useState(false);
+
+    // UI state
+    const [loading, setLoading] = useState(false);
+    const [checkingProfile, setCheckingProfile] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [fetchProgress, setFetchProgress] = useState('');
+
+    // Check if user already has a profile
+    useEffect(() => {
+        const checkExistingProfile = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                router.replace('/');
+                return;
+            }
+
+            const { data: existingProfile } = await supabase
+                .from('students')
+                .select('id')
+                .eq('id', user.id)
+                .single();
+
+            if (existingProfile) {
+                router.replace('/dashboard');
+                return;
+            }
+
+            setCheckingProfile(false);
+        };
+
+        checkExistingProfile();
+    }, [supabase, router]);
+
+    // Fetch captcha on mount
+    const fetchCaptcha = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('/api/ipu/captcha');
+            const data: CaptchaResponse = await res.json();
+            if (data.success && data.captchaImage && data.sessionId) {
+                setCaptchaImage(data.captchaImage);
+                setSessionId(data.sessionId);
+                setCaptchaInput('');
+            } else {
+                setError(data.message || 'Failed to load captcha');
+            }
+        } catch {
+            setError('Failed to connect to IPU server. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!checkingProfile && step === 'ipu-login') {
+            fetchCaptcha();
+        }
+    }, [checkingProfile, step, fetchCaptcha]);
+
+    // Handle IPU login
+    const handleIPULogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!enrollmentNo || !password || !captchaInput) {
+            setError('Please fill all fields');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const hashedPassword = await hashPassword(password, captchaInput);
+
+            const res = await fetch('/api/ipu/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: enrollmentNo,
+                    hashedPassword,
+                    captcha: captchaInput,
+                    sessionId,
+                }),
+            });
+
+            const data: LoginResponse = await res.json();
+
+            if (data.success && data.sessionId) {
+                setSessionId(data.sessionId);
+                setStep('fetching');
+                await fetchAllResults(data.sessionId);
+            } else {
+                setError(data.message || 'Login failed. Please check your credentials.');
+                fetchCaptcha();
+            }
+        } catch {
+            setError('Login failed. Please try again.');
+            fetchCaptcha();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch all semester results
+    const fetchAllResults = async (session: string) => {
+        setLoading(true);
+        setError(null);
+        setFetchProgress('Fetching all semester results...');
+
+        try {
+            // Fetch all results (semester=100 means all)
+            const res = await fetch(`/api/ipu/results?sessionId=${session}&semester=100`);
+            const data: IPUResultsResponse = await res.json();
+
+            if (!data.success || !data.results || data.results.length === 0) {
+                setError('No results found for this enrollment number. Please ensure you have declared results.');
+                setStep('ipu-login');
+                fetchCaptcha();
+                return;
+            }
+
+            // Extract student info from first result
+            const firstResult = data.results[0];
+            setStudentName(firstResult.stname || '');
+            setStudentInstitute(firstResult.instname || firstResult.iname || '');
+            setStudentProgram(firstResult.progname || firstResult.prgname || '');
+            setStudentBatch(firstResult.batch || firstResult.yoa || '');
+
+            // Group results by semester
+            const semesterMap = new Map<number, IPUResult[]>();
+            for (const result of data.results) {
+                const semNum = typeof result.euno === 'string' ? parseInt(result.euno) : (result.euno || 1);
+                if (!semesterMap.has(semNum)) {
+                    semesterMap.set(semNum, []);
+                }
+                semesterMap.get(semNum)!.push(result);
+            }
+
+            // Convert to array and sort by semester
+            const semesters: SemesterData[] = Array.from(semesterMap.entries())
+                .map(([semester, subjects]) => ({ semester, subjects }))
+                .sort((a, b) => a.semester - b.semester);
+
+            setSemesterResults(semesters);
+            setStep('review');
+        } catch {
+            setError('Failed to fetch results. Please try again.');
+            setStep('ipu-login');
+            fetchCaptcha();
+        } finally {
+            setLoading(false);
+            setFetchProgress('');
+        }
+    };
+
+    // Handle final submission
+    const handleSubmit = async () => {
+        if (!acknowledgeVoluntary) {
+            setError('Please acknowledge that you are submitting data voluntarily.');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                router.push('/');
+                return;
+            }
+
+            // Check if enrollment number already exists
+            const { data: existing } = await supabase
+                .from('students')
+                .select('id')
+                .eq('enrollment_no', enrollmentNo.trim().toUpperCase())
+                .single();
+
+            if (existing) {
+                setError('This enrollment number is already registered. Please contact support if this is your account.');
+                setLoading(false);
+                return;
+            }
+
+            // Create student profile
+            const { error: insertError } = await supabase
+                .from('students')
+                .insert({
+                    id: user.id,
+                    email: user.email,
+                    name: studentName || user.user_metadata?.full_name || user.email?.split('@')[0],
+                    avatar_url: user.user_metadata?.avatar_url,
+                    enrollment_no: enrollmentNo.trim().toUpperCase(),
+                    batch: studentBatch || null,
+                    branch: studentProgram || null,
+                    college: studentInstitute || null,
+                    consent_analytics: consentAnalytics,
+                    consent_rankboard: consentRankboard,
+                    display_mode: 'anonymous',
+                    marks_visibility: false,
+                });
+
+            if (insertError) {
+                console.error('Insert error:', insertError);
+                setError('Failed to create profile. Please try again.');
+                setLoading(false);
+                return;
+            }
+
+            // Log initial consent choices
+            const consentLogs = [];
+            if (consentAnalytics) {
+                consentLogs.push({ student_id: user.id, consent_type: 'analytics', action: 'granted' });
+            }
+            if (consentRankboard) {
+                consentLogs.push({ student_id: user.id, consent_type: 'rankboard', action: 'granted' });
+            }
+            if (consentLogs.length > 0) {
+                const { error: consentError } = await supabase.from('consent_log').insert(consentLogs);
+                if (consentError) {
+                    console.error('Consent log insert error:', consentError);
+                }
+            }
+
+            // Insert all academic records and subjects
+            for (const semData of semesterResults) {
+                // Create academic record
+                const { data: record, error: recordError } = await supabase
+                    .from('academic_records')
+                    .insert({
+                        student_id: user.id,
+                        enrollment_no: enrollmentNo.trim().toUpperCase(),
+                        semester: semData.semester,
+                    })
+                    .select()
+                    .single();
+
+                if (recordError) {
+                    console.error('Record error:', recordError);
+                    continue; // Skip this semester but continue with others
+                }
+
+                // Insert subjects for this semester
+                const subjectsToInsert = semData.subjects.map(result => {
+                    const internalMarks = parseInt(result.minorprint) || 0;
+                    const externalMarks = parseInt(result.majorprint) || 0;
+                    const totalMarks = parseInt(result.moderatedprint) || (internalMarks + externalMarks);
+
+                    // Priority 1: Use credits from subjectCredits.ts data file
+                    let credits = 0;
+                    if (result.papercode) {
+                        const dataCredits = getSubjectCredits(result.papercode.trim().toUpperCase());
+                        if (dataCredits !== undefined) {
+                            credits = dataCredits;
+                        }
+                    }
+
+                    // Priority 2: Try to use actual credits from API
+                    if (credits === 0 && result.credits !== undefined && result.credits !== null) {
+                        const apiCredits = typeof result.credits === 'string'
+                            ? parseInt(result.credits)
+                            : result.credits;
+                        if (!isNaN(apiCredits) && apiCredits > 0) {
+                            credits = apiCredits;
+                        }
+                    }
+
+                    // Priority 3: Estimate based on marks structure
+                    if (credits === 0) {
+                        // Estimate credits:
+                        // - If has internal marks > 20, likely theory (4 credits)
+                        // - If internal marks <= 20 or no internal, likely lab (2 credits)
+                        credits = 4; // Default for theory
+                        if (internalMarks === 0 || (internalMarks <= 20 && totalMarks <= 50)) {
+                            credits = 2; // Lab/Practical
+                        }
+                    }
+
+                    // Clamp internal/external to database constraints
+                    const clampedInternal = Math.min(Math.max(internalMarks, 0), 100);
+                    const clampedExternal = Math.min(Math.max(externalMarks, 0), 100);
+                    const clampedCredits = Math.min(Math.max(credits, 1), 10);
+
+                    return {
+                        record_id: record.id,
+                        code: result.papercode.trim().toUpperCase(),
+                        name: result.papername.trim(),
+                        internal_marks: clampedInternal,
+                        external_marks: clampedExternal,
+                        total_marks: totalMarks,
+                        credits: clampedCredits,
+                        grade: marksToGrade(totalMarks),
+                        grade_point: marksToGradePoint(totalMarks),
+                    };
+                });
+
+                const { error: subjectsError } = await supabase.from('subjects').insert(subjectsToInsert);
+                if (subjectsError) {
+                    console.error('Subjects insert error:', subjectsError);
+                }
+            }
+
+            // Redirect to dashboard
+            router.refresh();
+            router.replace('/dashboard');
+        } catch (err) {
+            console.error('Onboarding error:', err);
+            setError('An unexpected error occurred. Please try again.');
+            setLoading(false);
+        }
+    };
+
+    // Calculate totals for review
+    const totalSubjects = semesterResults.reduce((sum, s) => sum + s.subjects.length, 0);
+
+    // Show loading while checking for existing profile
+    if (checkingProfile) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col">
+            <main className="flex-1 flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-md">
+                    <div className="text-center mb-8 animate-fade-in-up">
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <GraduationCap className="w-8 h-8 text-[var(--primary)]" />
+                            <h1 className="text-2xl font-bold text-gradient">PeerList</h1>
+                        </div>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)]">
+                            {step === 'ipu-login' && 'Verify Your Identity'}
+                            {step === 'fetching' && 'Fetching Your Results'}
+                            {step === 'review' && 'Review Your Data'}
+                            {step === 'consent' && 'Privacy Settings'}
+                        </h2>
+                        <p className="text-[var(--text-secondary)] mt-2">
+                            {step === 'ipu-login' && 'Login with your official IPU portal credentials'}
+                            {step === 'fetching' && 'Please wait while we fetch your academic records'}
+                            {step === 'review' && 'Confirm your academic data before proceeding'}
+                            {step === 'consent' && 'Configure your privacy preferences'}
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-[var(--error)] bg-opacity-10 text-[var(--error)] animate-fade-in">
+                            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                            <p className="text-sm">{error}</p>
+                        </div>
+                    )}
+
+                    {/* Step 1: IPU Login */}
+                    {step === 'ipu-login' && (
+                        <form onSubmit={handleIPULogin} className="card p-6 space-y-4 animate-fade-in-up stagger-1">
+                            <div className="flex items-center gap-2 p-3 rounded-lg bg-[var(--primary)] bg-opacity-10 text-[var(--primary)]">
+                                <ShieldCheck className="w-5 h-5 flex-shrink-0" />
+                                <p className="text-sm">Your credentials are sent directly to the official IPU server and are never stored.</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                                    Enrollment Number
+                                </label>
+                                <input
+                                    type="text"
+                                    value={enrollmentNo}
+                                    onChange={(e) => setEnrollmentNo(e.target.value)}
+                                    placeholder="e.g., 12345678901"
+                                    className="input w-full"
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                                    IPU Portal Password
+                                </label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Your IPU portal password"
+                                    className="input w-full"
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                                    Captcha
+                                </label>
+                                <div className="flex items-center gap-2 mb-2">
+                                    {captchaImage ? (
+                                        <img
+                                            src={captchaImage}
+                                            alt="Captcha"
+                                            className="h-10 rounded border border-[var(--card-border)]"
+                                        />
+                                    ) : (
+                                        <div className="h-10 w-24 bg-[var(--secondary)] rounded flex items-center justify-center">
+                                            <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />
+                                        </div>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={fetchCaptcha}
+                                        disabled={loading}
+                                        className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                                        title="Refresh captcha"
+                                    >
+                                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                                    </button>
+                                </div>
+                                <input
+                                    type="text"
+                                    value={captchaInput}
+                                    onChange={(e) => setCaptchaInput(e.target.value)}
+                                    placeholder="Enter captcha"
+                                    className="input w-full"
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading || !captchaImage}
+                                className="btn-primary w-full flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Authenticating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="w-4 h-4" />
+                                        Verify & Fetch Results
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Step 2: Fetching */}
+                    {step === 'fetching' && (
+                        <div className="card p-8 animate-fade-in-up">
+                            <div className="flex flex-col items-center justify-center">
+                                <Loader2 className="w-12 h-12 animate-spin text-[var(--primary)] mb-4" />
+                                <p className="text-[var(--text-secondary)] text-center">{fetchProgress}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 3: Review */}
+                    {step === 'review' && (
+                        <div className="card p-6 space-y-4 animate-fade-in-up stagger-1">
+                            <div className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                <h3 className="font-medium text-[var(--text-primary)] mb-2">{studentName}</h3>
+                                <div className="space-y-1 text-sm text-[var(--text-secondary)]">
+                                    <p>Enrollment: {enrollmentNo}</p>
+                                    {studentInstitute && <p>Institute: {studentInstitute}</p>}
+                                    {studentProgram && <p>Program: {studentProgram}</p>}
+                                    {studentBatch && <p>Batch: {studentBatch}</p>}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-medium text-[var(--text-primary)]">
+                                    Academic Records Found
+                                </h4>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="p-3 rounded-lg bg-[var(--secondary)] text-center">
+                                        <p className="text-2xl font-bold text-[var(--primary)]">{semesterResults.length}</p>
+                                        <p className="text-xs text-[var(--text-muted)]">Semesters</p>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-[var(--secondary)] text-center">
+                                        <p className="text-2xl font-bold text-[var(--primary)]">{totalSubjects}</p>
+                                        <p className="text-xs text-[var(--text-muted)]">Subjects</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="max-h-48 overflow-y-auto space-y-2">
+                                {semesterResults.map((sem) => (
+                                    <div key={sem.semester} className="p-3 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-medium text-[var(--text-primary)]">
+                                                Semester {sem.semester}
+                                            </span>
+                                            <span className="text-xs text-[var(--text-muted)]">
+                                                {sem.subjects.length} subjects
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => setStep('consent')}
+                                className="btn-primary w-full flex items-center justify-center gap-2"
+                            >
+                                Continue
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Step 4: Consent */}
+                    {step === 'consent' && (
+                        <div className="card p-6 space-y-6 animate-fade-in-up stagger-1">
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-medium text-[var(--text-primary)]">
+                                    Privacy Settings
+                                </h3>
+
+                                <label className="flex items-start gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={consentAnalytics}
+                                        onChange={(e) => setConsentAnalytics(e.target.checked)}
+                                        className="mt-1 w-4 h-4 rounded accent-[var(--primary)]"
+                                    />
+                                    <div>
+                                        <span className="text-sm text-[var(--text-primary)]">
+                                            Enable Personal Analytics
+                                        </span>
+                                        <p className="text-xs text-[var(--text-muted)]">
+                                            View your SGPA/CGPA trends and grade distributions
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-start gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={consentRankboard}
+                                        onChange={(e) => setConsentRankboard(e.target.checked)}
+                                        className="mt-1 w-4 h-4 rounded accent-[var(--primary)]"
+                                    />
+                                    <div>
+                                        <span className="text-sm text-[var(--text-primary)]">
+                                            Participate in Rankboard
+                                        </span>
+                                        <p className="text-xs text-[var(--text-muted)]">
+                                            Compare with peers (anonymous by default)
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div className="pt-4 border-t border-[var(--card-border)]">
+                                <label className="flex items-start gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={acknowledgeVoluntary}
+                                        onChange={(e) => setAcknowledgeVoluntary(e.target.checked)}
+                                        className="mt-1 w-4 h-4 rounded accent-[var(--primary)]"
+                                        required
+                                    />
+                                    <div>
+                                        <span className="text-sm text-[var(--text-primary)]">
+                                            I acknowledge voluntary submission <span className="text-[var(--error)]">*</span>
+                                        </span>
+                                        <p className="text-xs text-[var(--text-muted)]">
+                                            I understand that I am submitting my academic data voluntarily and
+                                            this platform is not affiliated with any university.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setStep('review')}
+                                    className="btn-secondary flex-1"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={loading || !acknowledgeVoluntary}
+                                    className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CheckCircle2 className="w-5 h-5" />
+                                            Complete Setup
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </main>
+
+            <DisclaimerFooter />
+        </div>
+    );
+}
