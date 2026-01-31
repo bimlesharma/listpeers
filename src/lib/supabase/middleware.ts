@@ -49,7 +49,9 @@ export async function updateSession(request: NextRequest) {
     // Redirect authenticated users from landing/onboarding
     const pathname = request.nextUrl.pathname;
     const isLandingOrOnboarding = pathname === '/' || pathname === '/onboarding';
-    if (isLandingOrOnboarding && user) {
+    const allowLanding = request.nextUrl.searchParams.get('allowLanding') === '1';
+    const allowOnboarding = request.nextUrl.searchParams.get('allowOnboarding') === '1';
+    if (isLandingOrOnboarding && user && !(pathname === '/' && allowLanding)) {
         // Check if user has completed onboarding
         const { data: student, error } = await supabase
             .from('students')
@@ -69,6 +71,18 @@ export async function updateSession(request: NextRequest) {
             console.log('Middleware: No profile for user', user.id, '- redirecting to onboarding');
             url.pathname = '/onboarding';
             return NextResponse.redirect(url);
+        } else if (!allowOnboarding) {
+            // Prevent direct onboarding access if deletion history exists
+            const { data: deletionRecords } = await supabase.rpc(
+                'get_deletion_proof',
+                { p_user_email: user.email }
+            );
+
+            if (deletionRecords && deletionRecords.length > 0) {
+                console.log('Middleware: Deletion history found - redirecting to interstitial');
+                url.pathname = '/deletion-interstitial';
+                return NextResponse.redirect(url);
+            }
         }
     }
 

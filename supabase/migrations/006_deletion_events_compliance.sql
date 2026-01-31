@@ -7,6 +7,9 @@
 -- Ensure pgcrypto extension is available
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Drop unique constraint if it exists (to allow multiple deletions per user)
+ALTER TABLE IF EXISTS public.deletion_events DROP CONSTRAINT IF EXISTS deletion_events_user_id_hash_key;
+
 -- Create deletion_events table (immutable, never deleted)
 CREATE TABLE IF NOT EXISTS public.deletion_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -55,6 +58,7 @@ ALTER TABLE public.deletion_events ENABLE ROW LEVEL SECURITY;
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS deletion_events_admin_view ON public.deletion_events;
 DROP POLICY IF EXISTS deletion_events_service_insert ON public.deletion_events;
+DROP POLICY IF EXISTS deletion_events_user_no_insert ON public.deletion_events;
 DROP POLICY IF EXISTS deletion_events_no_modify ON public.deletion_events;
 DROP POLICY IF EXISTS deletion_events_no_delete ON public.deletion_events;
 
@@ -64,11 +68,19 @@ CREATE POLICY deletion_events_admin_view
   FOR SELECT
   USING (auth.jwt() ->> 'role' = 'admin');
 
--- Service role (API) can INSERT deletion events
+-- Service role (API) can INSERT deletion events - bypass RLS for service role
 CREATE POLICY deletion_events_service_insert
   ON public.deletion_events
   FOR INSERT
+  TO service_role
   WITH CHECK (true);
+
+-- Public/authenticated users cannot insert
+CREATE POLICY deletion_events_user_no_insert
+  ON public.deletion_events
+  FOR INSERT
+  TO authenticated, anon
+  WITH CHECK (false);
 
 -- No one can UPDATE or DELETE deletion events (immutable)
 CREATE POLICY deletion_events_no_modify
