@@ -15,22 +15,35 @@ import {
     Info,
     AlertTriangle,
     ChevronDown,
-    Github
+    Github,
+    Lock,
+    Eye,
+    Trash2,
+    Settings,
+    FileText,
+    Code,
+    Heart,
+    BookOpen
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LandingPage() {
     const supabase = createClient();
     const [loading, setLoading] = useState(false);
-    const [showDisclaimer, setShowDisclaimer] = useState(false);
+    const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
     const handleGitHubSignIn = async () => {
         setLoading(true);
-        await supabase.auth.signInWithOAuth({
-            provider: 'github',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        });
+        try {
+            await supabase.auth.signInWithOAuth({
+                provider: 'github',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const features = [
@@ -51,223 +64,446 @@ export default function LandingPage() {
         },
         {
             icon: Users,
-            title: 'Peer Comparison',
-            description: 'Opt-in to compare with anonymized batch rankings'
-        },
-        {
-            icon: Zap,
-            title: 'Fast & Responsive',
-            description: 'Optimized for all devices - mobile, tablet, and desktop'
+            title: 'Peer Network',
+            description: 'Connect with classmates and compare academic progress'
         },
         {
             icon: Shield,
             title: 'Privacy First',
-            description: 'Your data, your control. Full consent management'
+            description: 'Full control over what data is shared and with whom'
+        },
+        {
+            icon: Zap,
+            title: 'Real-time Data',
+            description: 'On-demand import from official IPU result systems'
+        }
+    ];
+
+    const faqs = [
+        {
+            question: 'Where does my data come from?',
+            answer: 'All academic data displayed is fetched on-demand and one-time only from official Guru Gobind Singh Indraprastha University (GGSIPU) result systems, after explicit user authorization. The platform is designed to respect responsible and non-abusive use of university infrastructure. We do not modify, store, or tamper with any academic information. Your credentials are never stored on our servers.'
+        },
+        {
+            question: 'Is my enrollment number visible to other students?',
+            answer: 'No. Your enrollment number is never displayed to other students. Based on your privacy settings, you can choose to appear as "Anonymous", "Pseudonymous" (as Student-XXXXXX), or "Visible" (with your name) to peers in the same college.'
+        },
+        {
+            question: 'Can I opt-out of features?',
+            answer: 'Yes. All features are opt-in. You can control whether your marks are shared with peers, whether you appear in rankings, and whether your data is used for analytics. You can change these preferences anytime in Settings.'
+        },
+        {
+            question: 'How is my CGPA calculated?',
+            answer: 'CGPA (Cumulative GPA) is calculated using the credit-weighted average: CGPA = Σ(Grade Points × Credits) / Σ(Credits) across all semesters. This follows the standard academic calculation method.'
+        },
+        {
+            question: 'Can I delete my account and data?',
+            answer: 'Yes. You have the right to delete your account completely at any time. This will permanently remove all your data from our servers. Once deleted, this action cannot be reversed.'
+        },
+        {
+            question: 'Is this an official GGSIPU platform?',
+            answer: 'No. This is NOT an official platform of Guru Gobind Singh Indraprastha University. It is an independent, student-run open-source project created to enhance the student experience. We are not affiliated with or endorsed by the university.'
+        },
+        {
+            question: 'How is my data protected?',
+            answer: 'We use industry-standard security practices including: encrypted connections (HTTPS/TLS), Row-Level Security (RLS) in the database, and compliance with GDPR/data protection regulations. Your credentials are never stored and are transmitted only to official IPU servers.'
+        },
+        {
+            question: 'What is the minimum cohort size for rankings?',
+            answer: 'The rankboard only shows when at least 2 students from the same college, batch, and branch have enabled ranking consent. This ensures privacy and prevents identification.'
         }
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--background)] overflow-x-hidden transition-colors duration-300">
-            {/* Background decoration */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-rose-500/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl" />
-            </div>
+        <div className="min-h-screen bg-[var(--bg)]">
+            {/* Navigation */}
+            <nav className="sticky top-0 z-40 border-b border-[var(--card-border)] bg-[var(--card-bg)]/95 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
+                            <GraduationCap className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-bold text-[var(--text-primary)] text-lg">PeerList</span>
+                    </div>
+                    <button
+                        onClick={handleGitHubSignIn}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-medium rounded-lg transition-all disabled:opacity-50"
+                    >
+                        {loading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Github className="w-4 h-4" />
+                        )}
+                        Sign In
+                    </button>
+                </div>
+            </nav>
 
             {/* Hero Section */}
-            <div className="relative min-h-screen flex flex-col">
-                {/* Header */}
-                <header className="w-full py-4 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-                                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                            </div>
-                            <span className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">PeerList<span className="text-rose-500">.</span></span>
-                        </div>
-                        <button
-                            onClick={() => setShowDisclaimer(!showDisclaimer)}
-                            className="flex items-center gap-1 text-xs sm:text-sm text-[var(--text-secondary)] hover:text-rose-400 transition-colors"
-                        >
-                            <Info className="w-4 h-4" />
-                            <span className="hidden sm:inline">Disclaimer</span>
-                        </button>
+            <section className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
+                <div className="text-center mb-12">
+                    <div className="inline-block mb-4 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20">
+                        <span className="text-rose-500 text-xs font-semibold">🎓 Student-Run • Open Source • Fully Transparent</span>
                     </div>
-                </header>
-
-                {/* Main Content */}
-                <main className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-4 sm:px-6 lg:px-8 py-8">
-                    {/* Left Side - Info */}
-                    <div className="w-full max-w-lg text-center lg:text-left animate-fade-in-up">
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-4 leading-tight">
-                            Your Results,{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-500">
-                                Reimagined
-                            </span>
-                        </h1>
-                        <p className="text-[var(--text-secondary)] text-sm sm:text-base lg:text-lg mb-8">
-                            A modern, privacy-first platform for viewing your GGSIPU examination results with detailed analytics, peer comparisons, and insights.
-                        </p>
-
-                        {/* Features Grid - Hidden on mobile, shown on lg */}
-                        <div className="hidden lg:grid grid-cols-2 gap-4">
-                            {features.slice(0, 4).map((feature, index) => (
-                                <div
-                                    key={feature.title}
-                                    className="flex items-start gap-3 p-3 rounded-xl bg-[var(--hover-bg)] border border-[var(--card-border)] hover:border-rose-500/30 transition-all duration-300 animate-fade-in-up"
-                                    style={{ animationDelay: `${index * 0.1}s` }}
-                                >
-                                    <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
-                                        <feature.icon className="w-5 h-5 text-rose-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-[var(--text-primary)] text-sm">{feature.title}</h3>
-                                        <p className="text-[var(--text-muted)] text-xs mt-0.5">{feature.description}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Right Side - Sign In Card */}
-                    <div className="w-full max-w-md animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        <div className="bg-[var(--secondary)] border border-[var(--card-border)] rounded-2xl p-6 sm:p-8 space-y-6">
-                            <div className="text-center">
-                                <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Get Started</h2>
-                                <p className="text-[var(--text-muted)] text-sm mt-1">Sign in to access your analytics</p>
-                            </div>
-
-                            {/* Info Banner */}
-                            <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4">
-                                <div className="flex items-start gap-3">
-                                    <Shield className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
-                                    <div>
-                                        <h4 className="font-semibold text-[var(--text-primary)] text-sm">IPU Verification Required</h4>
-                                        <p className="text-[var(--text-muted)] text-xs mt-1">
-                                            After signing in, you&apos;ll verify with your official IPU portal credentials to fetch your authentic results.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Sign In Button */}
-                            <button
-                                onClick={handleGitHubSignIn}
-                                disabled={loading}
-                                className="w-full py-3 px-6 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-rose-500/20 hover:shadow-rose-500/30 btn-shine ripple"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Connecting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Github className="w-5 h-5" />
-                                        Sign in with GitHub
-                                        <ArrowRight className="w-4 h-4" />
-                                    </>
-                                )}
-                            </button>
-
-                            {/* Privacy Note */}
-                            <p className="text-center text-[var(--text-muted)] text-xs">
-                                <Shield className="w-3 h-3 inline mr-1" />
-                                Your academic data stays private by default
-                            </p>
-                        </div>
-                    </div>
-                </main>
-
-                {/* Scroll Indicator */}
-                <div className="flex justify-center pb-6 lg:hidden animate-bounce">
-                    <ChevronDown className="w-6 h-6 text-[var(--text-muted)]" />
+                    <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4">
+                        Your Academic Performance, <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-600">Your Control</span>
+                    </h1>
+                    <p className="text-[var(--text-secondary)] text-lg mb-8 max-w-2xl mx-auto">
+                        Privacy-first academic analytics platform for GGSIPU students. Connect with peers, track your CGPA, and control exactly what data you share.
+                    </p>
                 </div>
-            </div>
 
-            {/* Features Section - Mobile */}
-            <section className="lg:hidden py-12 px-4 sm:px-6 bg-[var(--card-bg)] border-t border-[var(--card-border)]">
-                <div className="max-w-md mx-auto">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)] text-center mb-6">Features</h2>
-                    <div className="grid grid-cols-2 gap-3">
-                        {features.map((feature) => (
-                            <div
-                                key={feature.title}
-                                className="flex flex-col items-center text-center p-4 rounded-xl bg-[var(--secondary)] border border-[var(--card-border)]"
-                            >
-                                <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center mb-2">
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+                    {features.map((feature, i) => (
+                        <div key={i} className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] hover:border-rose-500/30 transition-all">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
                                     <feature.icon className="w-5 h-5 text-rose-500" />
                                 </div>
-                                <h3 className="font-bold text-[var(--text-primary)] text-xs">{feature.title}</h3>
-                                <p className="text-[var(--text-muted)] text-[10px] mt-1 leading-tight">{feature.description}</p>
+                                <div>
+                                    <h3 className="font-bold text-[var(--text-primary)]">{feature.title}</h3>
+                                    <p className="text-[var(--text-muted)] text-sm mt-1">{feature.description}</p>
+                                </div>
                             </div>
-                        ))}
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Disclaimers & Legal Section */}
+            <section className="bg-[var(--secondary)] border-y border-[var(--card-border)] py-16">
+                <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8 flex items-center gap-2">
+                        <AlertTriangle className="w-8 h-8 text-amber-500" />
+                        Important Disclaimers & Legal
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                <Lock className="w-5 h-5 text-rose-500" />
+                                No Credential Storage
+                            </h3>
+                            <p className="text-[var(--text-muted)] text-sm">Your IPU enrollment credentials are <span className="font-semibold text-rose-400">NEVER</span> stored on our servers. They are transmitted directly to official IPU servers for authentication. We cannot access them after the initial request.</p>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                <Info className="w-5 h-5 text-blue-500" />
+                                Not Official
+                            </h3>
+                            <p className="text-[var(--text-muted)] text-sm">This platform is <span className="font-semibold">NOT</span> officially affiliated with Guru Gobind Singh Indraprastha University (GGSIPU). We are an independent student-run project and have no official endorsement from the university.</p>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-green-500" />
+                                Data Accuracy
+                            </h3>
+                            <p className="text-[var(--text-muted)] text-sm">All academic data displayed is fetched on-demand and one-time only from official IPU result systems, after explicit user authorization. The platform is designed to respect responsible and non-abusive use of university infrastructure. We do not modify, verify, or guarantee accuracy. For official results, always refer to the official GGSIPU portal.</p>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                <Shield className="w-5 h-5 text-purple-500" />
+                                Limited Liability
+                            </h3>
+                            <p className="text-[var(--text-muted)] text-sm">We provide this platform "as-is" without warranties. We are not liable for data loss, service interruption, or any damages resulting from platform use. Use at your own risk.</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 p-6 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                        <p className="text-[var(--text-muted)] text-sm">
+                            By using this platform, you acknowledge that you have read and understood these disclaimers, and you assume full responsibility for any outcomes related to your use of PeerList.
+                        </p>
                     </div>
                 </div>
             </section>
 
-            {/* Disclaimer Modal */}
-            {showDisclaimer && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowDisclaimer(false)}>
-                    <div className="bg-[var(--secondary)] border border-[var(--card-border)] rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto animate-scale-in" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                                <AlertTriangle className="w-5 h-5 text-amber-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-[var(--text-primary)]">Disclaimer & Privacy</h3>
-                        </div>
+            {/* Privacy & Data Control Section */}
+            <section className="max-w-7xl mx-auto px-4 py-16">
+                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8 flex items-center gap-2">
+                    <Eye className="w-8 h-8 text-rose-500" />
+                    Your Privacy & Data Control
+                </h2>
 
-                        <div className="space-y-4 text-sm text-[var(--text-secondary)]">
-                            <div>
-                                <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">Data Privacy</h4>
-                                <p>Your IPU credentials are <span className="text-rose-400 font-semibold">NEVER</span> stored on our servers. They are transmitted directly to official IPU servers for authentication and result fetching.</p>
-                            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                        <h3 className="font-bold text-[var(--text-primary)] mb-3">What Data We Collect</h3>
+                        <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                            <li className="flex items-start gap-2">
+                                <span className="text-rose-500 mt-1">•</span>
+                                <span>Academic records (grades, SGPA, CGPA) from official IPU portal</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-rose-500 mt-1">•</span>
+                                <span>Your name, email, enrollment number, batch, branch, college</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-rose-500 mt-1">•</span>
+                                <span>Consent choices for analytics, rankings, and peer sharing</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-rose-500 mt-1">•</span>
+                                <span>Audit logs of all consent changes (for compliance)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-rose-500 mt-1">•</span>
+                                <span>Your GitHub profile (for authentication only)</span>
+                            </li>
+                        </ul>
+                    </div>
 
-                            <div>
-                                <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">Consent-Driven</h4>
-                                <p>All features are opt-in. You control what data is used for analytics, peer comparisons, and rankings.</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">Data Source</h4>
-                                <p>All academic data is fetched directly from the official IPU result portal. We do not modify any academic information.</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">No Affiliation</h4>
-                                <p>This platform is <span className="text-rose-400 font-semibold">NOT</span> officially affiliated with Guru Gobind Singh Indraprastha University. It is an independent project created to enhance the student experience.</p>
-                            </div>
-
-                            <div className="pt-4 border-t border-[var(--card-border)]">
-                                <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">Your Rights</h4>
-                                <ul className="list-disc list-inside space-y-1 text-xs">
-                                    <li>Export all your data anytime</li>
-                                    <li>Delete your account and data completely</li>
-                                    <li>Control visibility in rankings</li>
-                                    <li>Revoke consents at any time</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => setShowDisclaimer(false)}
-                            className="w-full mt-6 py-2 px-4 bg-[var(--card-bg)] hover:bg-[var(--hover-bg)] border border-[var(--card-border)] text-[var(--text-primary)] font-medium rounded-lg transition-colors text-sm"
-                        >
-                            I Understand
-                        </button>
+                    <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                        <h3 className="font-bold text-[var(--text-primary)] mb-3">What We Don't Do</h3>
+                        <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-500 mt-1">✓</span>
+                                <span>Never store your IPU credentials</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-500 mt-1">✓</span>
+                                <span>Never sell or share data with third parties</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-500 mt-1">✓</span>
+                                <span>Never modify your academic records</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-500 mt-1">✓</span>
+                                <span>Never use data for targeted advertising</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-500 mt-1">✓</span>
+                                <span>Never share enrollment numbers with peers</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            )}
+
+                <div className="p-6 rounded-lg bg-rose-500/5 border border-rose-500/20">
+                    <h3 className="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                        <Settings className="w-5 h-5 text-rose-500" />
+                        Your Rights & Controls
+                    </h3>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[var(--text-muted)] text-sm">
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Export all your data anytime</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Delete account and data permanently</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Control visibility in rankings</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Revoke consent anytime</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Audit log maintained for transparency</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-rose-500">→</span>
+                            <span>Choose visibility mode (Anonymous/Pseudonymous/Visible)</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            {/* Account Control Section */}
+            <section className="bg-[var(--secondary)] border-y border-[var(--card-border)] py-16">
+                <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8 flex items-center gap-2">
+                        <Settings className="w-8 h-8 text-rose-500" />
+                        Account & Data Management
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3">
+                                <Settings className="w-6 h-6 text-blue-500" />
+                            </div>
+                            <h3 className="font-bold text-[var(--text-primary)] mb-2">Manage Consents</h3>
+                            <p className="text-[var(--text-muted)] text-sm">Control which features you participate in: analytics, rankings, peer sharing, and identity visibility.</p>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3">
+                                <Eye className="w-6 h-6 text-purple-500" />
+                            </div>
+                            <h3 className="font-bold text-[var(--text-primary)] mb-2">Privacy Modes</h3>
+                            <p className="text-[var(--text-muted)] text-sm">Choose how you appear to peers: Anonymous, Pseudonymous (hashed ID), or Visible (with your name).</p>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)]">
+                            <div className="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center mb-3">
+                                <Trash2 className="w-6 h-6 text-red-500" />
+                            </div>
+                            <h3 className="font-bold text-[var(--text-primary)] mb-2">Delete Account</h3>
+                            <p className="text-[var(--text-muted)] text-sm">Permanently delete your account and all associated data. This action cannot be reversed.</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 p-6 rounded-lg bg-[var(--bg)] border border-[var(--card-border)]">
+                        <h3 className="font-bold text-[var(--text-primary)] mb-3">Audit Log</h3>
+                        <p className="text-[var(--text-muted)] text-sm mb-3">All consent changes are logged immutably for transparency and compliance.</p>
+                        <div className="text-xs text-[var(--text-muted)] space-y-1">
+                            <div>✓ Date and time of each consent change</div>
+                            <div>✓ What was changed (analytics, rankings, etc.)</div>
+                            <div>✓ Whether it was granted or revoked</div>
+                            <div>✓ Complete immutable history</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="max-w-7xl mx-auto px-4 py-16">
+                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8 flex items-center gap-2">
+                    <BookOpen className="w-8 h-8 text-rose-500" />
+                    Frequently Asked Questions
+                </h2>
+
+                <div className="space-y-3">
+                    {faqs.map((faq, i) => (
+                        <div key={i} className="rounded-lg border border-[var(--card-border)] bg-[var(--secondary)] overflow-hidden">
+                            <button
+                                onClick={() => setExpandedFAQ(expandedFAQ === i ? null : i)}
+                                className="w-full px-6 py-4 flex items-center justify-between hover:bg-[var(--card-bg)] transition-colors"
+                            >
+                                <h3 className="text-[var(--text-primary)] font-semibold text-left">{faq.question}</h3>
+                                <ChevronDown className={`w-5 h-5 text-rose-500 transition-transform ${expandedFAQ === i ? 'rotate-180' : ''}`} />
+                            </button>
+                            {expandedFAQ === i && (
+                                <div className="px-6 py-4 border-t border-[var(--card-border)] bg-[var(--card-bg)]">
+                                    <p className="text-[var(--text-muted)] text-sm leading-relaxed">{faq.answer}</p>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Open Source & Compliance Section */}
+            <section className="bg-gradient-to-r from-rose-500/10 to-pink-600/10 border-y border-rose-500/20 py-16">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <Code className="w-6 h-6 text-rose-500" />
+                                Open Source & Transparent
+                            </h2>
+                            <p className="text-[var(--text-muted)] mb-4">PeerList is completely open source. Our code is publicly available for review and contribution. We believe in transparency and community-driven development.</p>
+                            <a
+                                href="https://github.com/bimlesh1/peerlist"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg transition-colors"
+                            >
+                                <Github className="w-4 h-4" />
+                                View on GitHub
+                            </a>
+                        </div>
+
+                        <div>
+                            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <Heart className="w-6 h-6 text-rose-500" />
+                                Student-Run Initiative
+                            </h2>
+                            <p className="text-[var(--text-muted)] mb-4">Built by GGSIPU students, for GGSIPU students. We understand the platform's limitations and created this to make academic tracking easier, fairer, and more transparent.</p>
+                            <p className="text-[var(--text-muted)] text-sm">No corporate interests. No hidden agendas. Just students helping students.</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3">Compliance</h3>
+                            <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                                <li>✓ GDPR Compliant</li>
+                                <li>✓ Aligned with Indian data protection frameworks</li>
+                                <li>✓ Data Protection Act aligned</li>
+                                <li>✓ No unauthorized data retention</li>
+                                <li>✓ Transparent privacy policies</li>
+                            </ul>
+                        </div>
+
+                        <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                            <h3 className="font-bold text-[var(--text-primary)] mb-3">Technology & Security</h3>
+                            <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                                <li>✓ End-to-end encrypted connections (TLS)</li>
+                                <li>✓ Row-Level Security (RLS) in database</li>
+                                <li>✓ Server-side validation</li>
+                                <li>✓ Immutable audit logs</li>
+                                <li>✓ Regular security updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Privacy Policy & Terms Link */}
+            <section className="max-w-7xl mx-auto px-4 py-12">
+                <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] text-center">
+                    <p className="text-[var(--text-muted)] mb-4">
+                        For detailed information about how we collect, use, and protect your data, please review our full policies:
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <a href="#" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Privacy Policy</a>
+                        <span className="text-[var(--card-border)]">•</span>
+                        <a href="#" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Terms of Service</a>
+                        <span className="text-[var(--card-border)]">•</span>
+                        <a href="#" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Data Protection</a>
+                        <span className="text-[var(--card-border)]">•</span>
+                        <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Source Code</a>
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="bg-gradient-to-r from-rose-500 to-pink-600 text-white py-16">
+                <div className="max-w-4xl mx-auto px-4 text-center">
+                    <h2 className="text-3xl font-bold mb-4">Ready to Take Control of Your Academic Journey?</h2>
+                    <p className="text-white/90 mb-6 text-lg">Sign in with GitHub and start tracking your performance with complete privacy and transparency.</p>
+                    <button
+                        onClick={handleGitHubSignIn}
+                        disabled={loading}
+                        className="flex items-center gap-2 mx-auto px-6 py-3 bg-white text-rose-600 font-bold rounded-lg hover:bg-white/90 transition-all disabled:opacity-50"
+                    >
+                        {loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <Github className="w-5 h-5" />
+                        )}
+                        Sign In with GitHub
+                    </button>
+                </div>
+            </section>
 
             {/* Footer */}
-            <footer className="py-6 px-4 border-t border-[var(--card-border)] bg-[var(--card-bg)]">
-                <div className="max-w-7xl mx-auto text-center">
-                    <p className="text-[var(--text-muted)] text-xs sm:text-sm">
-                        Made with <span className="text-rose-500">♥</span> for GGSIPU Students
+            <footer className="border-t border-[var(--card-border)] bg-[var(--card-bg)] py-8">
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
+                            <GraduationCap className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="font-bold text-[var(--text-primary)]">PeerList</span>
+                    </div>
+                    <p className="text-[var(--text-muted)] text-sm mb-2">
+                        Made with <Heart className="w-4 h-4 inline text-rose-500" /> by GGSIPU students for GGSIPU students
                     </p>
-                    <p className="text-[var(--text-muted)] text-[10px] sm:text-xs mt-1">
-                        Not affiliated with Guru Gobind Singh Indraprastha University
+                    <p className="text-[var(--text-muted)] text-xs mb-3">
+                        Not affiliated with Guru Gobind Singh Indraprastha University • Open Source Initiative
+                    </p>
+                    <p className="text-[var(--text-muted)] text-xs">
+                        © 2026 PeerList. All rights reserved. | 
+                        <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:text-rose-600 ml-1">GitHub</a>
                     </p>
                 </div>
             </footer>
