@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "PeerList | Academic Analytics Platform",
   description: "Privacy-first, consent-driven academic analytics platform for students",
   robots: "noindex, nofollow", // No SEO indexing as per PRD
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
