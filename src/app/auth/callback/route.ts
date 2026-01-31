@@ -15,28 +15,30 @@ export async function GET(request: Request) {
             const { data: { user } } = await supabase.auth.getUser();
 
             if (user) {
-                try {
-                    // Check for deletion history server-side
-                    const { data: deletionRecords, error: deletionError } = await supabase.rpc(
-                        'get_deletion_proof',
-                        { p_user_email: user.email }
-                    );
-
-                    if (!deletionError && deletionRecords && deletionRecords.length > 0) {
-                        // User has deletion history - redirect to interstitial
-                        return NextResponse.redirect(`${origin}/deletion-interstitial`);
-                    }
-                } catch (err) {
-                    console.error('Error checking deletion history:', err);
-                    // Continue with normal flow if check fails
-                }
-
                 // Check if user has completed onboarding
                 const { data: student } = await supabase
                     .from('students')
                     .select('id')
                     .eq('id', user.id)
                     .single();
+
+                if (!student) {
+                    try {
+                        // Check for deletion history server-side
+                        const { data: deletionRecords, error: deletionError } = await supabase.rpc(
+                            'get_deletion_proof',
+                            { p_user_email: user.email }
+                        );
+
+                        if (!deletionError && deletionRecords && deletionRecords.length > 0) {
+                            // User has deletion history but no profile yet - show interstitial
+                            return NextResponse.redirect(`${origin}/deletion-interstitial`);
+                        }
+                    } catch (err) {
+                        console.error('Error checking deletion history:', err);
+                        // Continue with normal flow if check fails
+                    }
+                }
 
                 // Redirect to dashboard if onboarded, otherwise to onboarding
                 const redirectTo = student ? '/dashboard' : '/onboarding';
