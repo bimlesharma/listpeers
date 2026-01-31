@@ -191,7 +191,7 @@ supabase/
 ### 1. Install dependencies
 
 ```bash
-cd peerlist
+cd listpeers
 npm install
 ```
 

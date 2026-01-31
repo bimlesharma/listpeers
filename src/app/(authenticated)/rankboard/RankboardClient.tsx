@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Student } from '@/types';
-import { Trophy, Lock, Users, Filter, Loader2, X } from 'lucide-react';
+import { Trophy, Lock, Users, Filter, Loader2, X, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface RankboardEntry {
     student_id: string;
@@ -26,6 +28,8 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
     const router = useRouter();
     const supabase = createClient();
     const [loading, setLoading] = useState(false);
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === 'dark';
 
     // Set default filters to user's own batch, branch, and college
     const [batchFilter, setBatchFilter] = useState<string>(student.batch || 'all');
@@ -57,6 +61,27 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
         setBranchFilter('all');
         setCollegeFilter('all');
     };
+
+    // Calculate CGPA distribution data
+    const getCGPADistribution = () => {
+        const ranges = [
+            { label: '9.0-10.0', min: 9, max: 10, count: 0, color: '#eab308' },
+            { label: '8.0-8.9', min: 8, max: 9, count: 0, color: '#f43f5e' },
+            { label: '7.0-7.9', min: 7, max: 8, count: 0, color: '#a855f7' },
+            { label: '6.0-6.9', min: 6, max: 7, count: 0, color: '#3b82f6' },
+            { label: '5.0-5.9', min: 5, max: 6, count: 0, color: '#10b981' },
+            { label: '<5.0', min: 0, max: 5, count: 0, color: '#6b7280' },
+        ];
+
+        filteredData.forEach(entry => {
+            const range = ranges.find(r => entry.cgpa >= r.min && entry.cgpa < r.max);
+            if (range) range.count++;
+        });
+
+        return ranges.filter(r => r.count > 0);
+    };
+
+    const cgpaDistribution = getCGPADistribution();
 
     const handleOptIn = async () => {
         setLoading(true);
@@ -216,9 +241,72 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                 </div>
             </div>
 
+            {/* CGPA Distribution Chart */}
+            {filteredData.length > 0 && (
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-6 mb-6 animate-fade-in-up stagger-2">
+                    <div className="flex items-center gap-2 mb-4">
+                        <BarChart3 className="w-5 h-5 text-rose-500" />
+                        <h2 className="text-lg font-bold text-(--text-primary)">
+                            CGPA Distribution
+                        </h2>
+                    </div>
+                    <p className="text-sm text-(--text-secondary) mb-6">
+                        Overview of CGPA ranges across {filteredData.length} participant{filteredData.length !== 1 ? 's' : ''}
+                    </p>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={cgpaDistribution}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#27272a' : '#d6d3d1'} />
+                                <XAxis
+                                    dataKey="label"
+                                    stroke={isDark ? '#71717a' : '#78716c'}
+                                    style={{ fontSize: '12px' }}
+                                />
+                                <YAxis
+                                    stroke={isDark ? '#71717a' : '#78716c'}
+                                    style={{ fontSize: '12px' }}
+                                    allowDecimals={false}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: isDark ? '#0f0f0f' : '#fafaf9',
+                                        border: `1px solid ${isDark ? '#27272a' : '#d6d3d1'}`,
+                                        borderRadius: '8px',
+                                        color: isDark ? '#ffffff' : '#1c1917',
+                                    }}
+                                    labelStyle={{ color: isDark ? '#ffffff' : '#1c1917' }}
+                                    formatter={(value: number | undefined) => {
+                                        if (value === undefined) return ['0 students', 'Count'];
+                                        return [`${value} student${value !== 1 ? 's' : ''}`, 'Count'];
+                                    }}
+                                />
+                                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                                    {cgpaDistribution.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-6">
+                        {cgpaDistribution.map((range, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                                <div
+                                    className="w-3 h-3 rounded"
+                                    style={{ backgroundColor: range.color }}
+                                />
+                                <span className="text-xs text-(--text-secondary)">
+                                    {range.label}: {range.count}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Rankboard Table */}
             {filteredData.length > 0 ? (
-                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl overflow-hidden animate-fade-in-up stagger-2">
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl overflow-hidden animate-fade-in-up stagger-3">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -302,7 +390,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                     </div>
                 </div>
             ) : (
-                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-12 text-center animate-fade-in-up stagger-3">
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-12 text-center animate-fade-in-up stagger-4">
                     <div className="p-4 rounded-full bg-secondary w-fit mx-auto mb-4">
                         <Users className="w-10 h-10 text-(--text-muted)" />
                     </div>
