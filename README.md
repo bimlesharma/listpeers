@@ -5,6 +5,7 @@ PeerList is a privacy-first, consent-driven academic analytics platform built wi
 ## Table of Contents
 
 - [Core Principles](#core-principles)
+- [Recent Updates](#recent-updates)
 - [Key Features](#key-features)
 - [Privacy and Consent Model](#privacy-and-consent-model)
 - [How It Works](#how-it-works)
@@ -31,6 +32,14 @@ PeerList is a privacy-first, consent-driven academic analytics platform built wi
 - **Data minimization**: Only required data is collected and stored.
 - **Transparent control**: Users can view and change all privacy settings at any time.
 
+## Recent Updates
+
+- **GDPR-aligned deletion logging**: Account deletion now records a compliance event before data removal.
+- **Deletion interstitial**: Users with prior deletions see a gated interstitial after OAuth sign-in.
+- **Hardened Supabase policies**: Expanded RLS/RPC safeguards and internal views for compliance workflows.
+- **Consent gating polish**: Rankboard and analytics gates refined for clearer opt-in UX.
+- **Tailwind v4 syntax migration**: Class utilities updated to new variable syntax (e.g. `text-(--text-muted)`).
+
 ## Key Features
 
 - **Academic analytics dashboard**: SGPA/CGPA trends, grade distributions, subject-wise breakdowns
@@ -38,6 +47,7 @@ PeerList is a privacy-first, consent-driven academic analytics platform built wi
 - **Peer comparisons**: Optional and strictly opt-in
 - **Granular identity controls**: Anonymous, pseudonymous, or fully visible display modes
 - **Raw-only mode**: When analytics consent is disabled, only raw marks tables are shown
+- **Deletion compliance**: Logged deletion events for auditability
 - **Modern UI**: Responsive design, dark/light themes, modern charts and cards
 
 ## Who Can Use It
@@ -145,6 +155,7 @@ When `consent_analytics` is false:
 src/
 ├── app/
 │   ├── page.tsx                 # Landing page
+│   ├── deletion-interstitial/   # Post-deletion re-registration gate
 │   ├── onboarding/              # First-time user setup
 │   ├── auth/callback/           # OAuth callback handler
 │   └── (authenticated)/         # Protected routes
@@ -155,6 +166,8 @@ src/
 ├── components/
 │   ├── Charts/                  # Recharts components
 │   ├── Navbar.tsx               # Navigation
+│   ├── PublicNavbar.tsx         # Landing page navigation
+│   ├── PublicFooter.tsx         # Landing page footer
 │   ├── ThemeProvider.tsx        # Dark/light mode
 │   └── ResultTable.tsx          # Raw and full data tables
 ├── lib/
@@ -164,6 +177,13 @@ src/
 │   └── utils.ts                 # Utility functions
 └── types/
     └── index.ts                 # TypeScript interfaces
+
+public/
+└── favicon.svg
+
+supabase/
+├── migrations/                  # SQL migrations
+└── schema.sql                   # Base schema
 ```
 
 ## Getting Started

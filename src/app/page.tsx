@@ -20,7 +20,6 @@ import {
     Heart,
     BookOpen
 } from 'lucide-react';
-import Link from 'next/link';
 import { PublicNavbar } from '@/components/PublicNavbar';
 import { PublicFooter } from '@/components/PublicFooter';
 
@@ -116,7 +115,7 @@ export default function LandingPage() {
             <PublicNavbar />
 
             {/* Hero Section */}
-            <section className="relative min-h-[calc(100vh-64px) flex items-center justify-center overflow-hidden bg-linear-to-b from-[var(--bg) via-[var(--bg) to-[var(--secondary)/30">
+            <section className="relative min-h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden bg-linear-to-b from-[var(--bg)] via-[var(--bg)] to-[var(--secondary)/30]">
                 {/* Animated gradient background elements */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-20 left-10 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -163,7 +162,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Trust indicators */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-((--text-muted) pt-8 border-t border-[var(--card-border)">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-(--text-muted) pt-8 border-t border-[var(--card-border)]">
                             <div className="flex items-center gap-2">
                                 <span className="text-green-500 font-bold">✓</span>
                                 <span>End-to-end Encrypted</span>
@@ -185,14 +184,14 @@ export default function LandingPage() {
             <section className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
                     {features.map((feature, i) => (
-                        <div key={i} className="p-4 rounded-lg bg-secondary border border-[var(--card-border) hover:border-rose-500/30 transition-all">
+                        <div key={i} className="p-4 rounded-lg bg-(--secondary) border border-[var(--card-border)] hover:border-rose-500/30 transition-all">
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center shrink-0">
                                     <feature.icon className="w-5 h-5 text-rose-500" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-(--text-primary)">{feature.title}</h3>
-                                    <p className="text-((--text-muted) text-sm mt-1">{feature.description}</p>
+                                    <p className="text-(--text-muted) text-sm mt-1">{feature.description}</p>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +200,7 @@ export default function LandingPage() {
             </section>
 
             {/* Account Control Section */}
-            <section className="bg-secondary border-y border-[var(--card-border) py-16">
+            <section className="bg-(--secondary) border-y border-[var(--card-border)] py-16">
                 <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-3xl font-bold text-(--text-primary) mb-8 flex items-center gap-2">
                         <Settings className="w-8 h-8 text-rose-500" />
@@ -209,35 +208,35 @@ export default function LandingPage() {
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)">
+                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)]">
                             <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3">
                                 <Settings className="w-6 h-6 text-blue-500" />
                             </div>
                             <h3 className="font-bold text-(--text-primary) mb-2">Manage Consents</h3>
-                            <p className="text-((--text-muted) text-sm">Control which features you participate in: analytics, rankings, peer sharing, and identity visibility.</p>
+                            <p className="text-(--text-muted) text-sm">Control which features you participate in: analytics, rankings, peer sharing, and identity visibility.</p>
                         </div>
 
-                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)">
+                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)]">
                             <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3">
                                 <Eye className="w-6 h-6 text-purple-500" />
                             </div>
                             <h3 className="font-bold text-(--text-primary) mb-2">Privacy Modes</h3>
-                            <p className="text-((--text-muted) text-sm">Choose how you appear to peers: Anonymous, Pseudonymous (hashed ID), or Visible (with your name).</p>
+                            <p className="text-(--text-muted) text-sm">Choose how you appear to peers: Anonymous, Pseudonymous (hashed ID), or Visible (with your name).</p>
                         </div>
 
-                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)">
+                        <div className="p-6 rounded-lg bg-(--card-bg) border border-[var(--card-border)]">
                             <div className="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center mb-3">
                                 <Trash2 className="w-6 h-6 text-red-500" />
                             </div>
                             <h3 className="font-bold text-(--text-primary) mb-2">Delete Account</h3>
-                            <p className="text-((--text-muted) text-sm">Permanently delete your account and all associated data. This action cannot be reversed.</p>
+                            <p className="text-(--text-muted) text-sm">Permanently delete your account and all associated data. This action cannot be reversed.</p>
                         </div>
                     </div>
 
-                    <div className="mt-8 p-6 rounded-lg bg-(--bg) border border-[var(--card-border)">
+                    <div className="mt-8 p-6 rounded-lg bg-(--bg) border border-[var(--card-border)]">
                         <h3 className="font-bold text-(--text-primary) mb-3">Audit Log</h3>
-                        <p className="text-((--text-muted) text-sm mb-3">All consent changes are logged immutably for transparency and compliance.</p>
-                        <div className="text-xs text-((--text-muted) space-y-1">
+                        <p className="text-(--text-muted) text-sm mb-3">All consent changes are logged immutably for transparency and compliance.</p>
+                        <div className="text-xs text-(--text-muted) space-y-1">
                             <div>✓ Date and time of each consent change</div>
                             <div>✓ What was changed (analytics, rankings, etc.)</div>
                             <div>✓ Whether it was granted or revoked</div>
@@ -256,7 +255,7 @@ export default function LandingPage() {
 
                 <div className="space-y-3">
                     {faqs.map((faq, i) => (
-                        <div key={i} className="rounded-lg border border-[var(--card-border) bg-secondary overflow-hidden">
+                        <div key={i} className="rounded-lg border border-[var(--card-border)] bg-(--secondary) overflow-hidden">
                             <button
                                 onClick={() => setExpandedFAQ(expandedFAQ === i ? null : i)}
                                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-(--card-bg) transition-colors"
@@ -265,8 +264,8 @@ export default function LandingPage() {
                                 <ChevronDown className={`w-5 h-5 text-rose-500 transition-transform ${expandedFAQ === i ? 'rotate-180' : ''}`} />
                             </button>
                             {expandedFAQ === i && (
-                                <div className="px-6 py-4 border-t border-[var(--card-border) bg-(--card-bg)">
-                                    <p className="text-((--text-muted) text-sm leading-relaxed">{faq.answer}</p>
+                                <div className="px-6 py-4 border-t border-[var(--card-border)] bg-(--card-bg)">
+                                    <p className="text-(--text-muted) text-sm leading-relaxed">{faq.answer}</p>
                                 </div>
                             )}
                         </div>
@@ -283,7 +282,7 @@ export default function LandingPage() {
                                 <Code className="w-6 h-6 text-rose-500" />
                                 Open Source & Transparent
                             </h2>
-                            <p className="text-((--text-muted) mb-4">PeerList is completely open source. Our code is publicly available for review and contribution. We believe in transparency and community-driven development.</p>
+                            <p className="text-(--text-muted) mb-4">PeerList is completely open source. Our code is publicly available for review and contribution. We believe in transparency and community-driven development.</p>
                             <a
                                 href="https://github.com/bimlesh1/peerlist"
                                 target="_blank"
@@ -300,15 +299,15 @@ export default function LandingPage() {
                                 <Heart className="w-6 h-6 text-rose-500" />
                                 Student-Run Initiative
                             </h2>
-                            <p className="text-((--text-muted) mb-4">Built by GGSIPU students, for GGSIPU students. We understand the platform's limitations and created this to make academic tracking easier, fairer, and more transparent.</p>
-                            <p className="text-((--text-muted) text-sm">No corporate interests. No hidden agendas. Just students helping students.</p>
+                            <p className="text-(--text-muted) mb-4">Built by GGSIPU students, for GGSIPU students. We understand the platform's limitations and created this to make academic tracking easier, fairer, and more transparent.</p>
+                            <p className="text-(--text-muted) text-sm">No corporate interests. No hidden agendas. Just students helping students.</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-6 rounded-lg bg-secondary border border-[var(--card-border)">
+                        <div className="p-6 rounded-lg bg-(--secondary) border border-[var(--card-border)]">
                             <h3 className="font-bold text-(--text-primary) mb-3">Compliance</h3>
-                            <ul className="space-y-2 text-((--text-muted) text-sm">
+                            <ul className="space-y-2 text-(--text-muted) text-sm">
                                 <li>✓ GDPR Compliant</li>
                                 <li>✓ Aligned with Indian data protection frameworks</li>
                                 <li>✓ Data Protection Act aligned</li>
@@ -317,9 +316,9 @@ export default function LandingPage() {
                             </ul>
                         </div>
 
-                        <div className="p-6 rounded-lg bg-secondary border border-[var(--card-border)">
+                        <div className="p-6 rounded-lg bg-(--secondary) border border-[var(--card-border)]">
                             <h3 className="font-bold text-(--text-primary) mb-3">Technology & Security</h3>
-                            <ul className="space-y-2 text-((--text-muted) text-sm">
+                            <ul className="space-y-2 text-(--text-muted) text-sm">
                                 <li>✓ End-to-end encrypted connections (TLS)</li>
                                 <li>✓ Row-Level Security (RLS) in database</li>
                                 <li>✓ Server-side validation</li>

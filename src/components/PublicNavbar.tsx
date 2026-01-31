@@ -37,7 +37,7 @@ export function PublicNavbar() {
     };
 
     return (
-        <nav className="glass sticky top-0 z-50 border-b border-(--card-border)">
+        <nav className="glass sticky top-0 z-50 border-b border-[var(--card-border)]">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
@@ -115,7 +115,7 @@ export function PublicNavbar() {
 
                 {/* Mobile Navigation */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden py-4 border-t border-(--card-border) animate-fade-in">
+                    <div className="md:hidden py-4 border-t border-[var(--card-border)] animate-fade-in">
                         <div className="flex flex-col gap-1">
                             {navItems.map((item) => {
                                 const isActive = pathname === item.href;
