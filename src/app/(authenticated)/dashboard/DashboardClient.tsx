@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardHeader } from '@/components/DashboardHeader';
-import { ResultTable, SemesterSummaryTable } from '@/components/ResultTable';
+import { ResultTable, SemesterSummaryTable, ResultTableRawOnly, SemesterSummaryTableRawOnly } from '@/components/ResultTable';
 import { SemesterStats, OverallStats } from '@/components/SemesterStats';
 import { SGPATrendChart, GradeDistributionChart, SubjectRadarChart, SemesterMarksChart } from '@/components/PerformanceCharts';
 import { SubjectMarksStackedBarChart } from '@/components/SubjectMarksStackedBarChart';
@@ -29,9 +29,10 @@ interface ProcessedSemester {
 interface DashboardClientProps {
     student: Student;
     records: RecordWithSubjects[];
+    consentAnalytics?: boolean;
 }
 
-export function DashboardClient({ student, records }: DashboardClientProps) {
+export function DashboardClient({ student, records, consentAnalytics = false }: DashboardClientProps) {
     const [activeTab, setActiveTab] = useState('Overall');
 
     const hasData = records.length > 0;
@@ -160,68 +161,117 @@ export function DashboardClient({ student, records }: DashboardClientProps) {
                 <div key={activeTab} className="space-y-4 sm:space-y-6 md:space-y-8 animate-blur-in">
                     {activeTab === 'Overall' ? (
                         <>
-                            <OverallStats
-                                totalObtained={processed.reduce((sum, sem) => sum + sem.totalMarks, 0)}
-                                totalMax={processed.reduce((sum, sem) => sum + sem.maxMarks, 0)}
-                                cgpa={cgpa}
-                                totalCredits={totalCredits}
-                                totalSubjects={allSubjects.length}
-                                totalSemesters={processed.length}
-                                semesterNumbers={processed.map(p => p.semesterNumber)}
-                            />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                <SGPATrendChart
+                            {consentAnalytics && (
+                                <>
+                                    <OverallStats
+                                        totalObtained={processed.reduce((sum, sem) => sum + sem.totalMarks, 0)}
+                                        totalMax={processed.reduce((sum, sem) => sum + sem.maxMarks, 0)}
+                                        cgpa={cgpa}
+                                        totalCredits={totalCredits}
+                                        totalSubjects={allSubjects.length}
+                                        totalSemesters={processed.length}
+                                        semesterNumbers={processed.map(p => p.semesterNumber)}
+                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                        <SGPATrendChart
+                                            data={processed.map(p => ({
+                                                semester: p.semester,
+                                                semesterNumber: p.semesterNumber,
+                                                sgpa: p.sgpa,
+                                                totalSubjects: p.totalSubjects,
+                                                totalCredits: p.totalCredits,
+                                            }))}
+                                            onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
+                                        />
+                                        <GradeDistributionChart grades={gradeDistribution} />
+                                    </div>
+                                    <SemesterMarksChart
+                                        data={processed}
+                                        onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
+                                    />
+                                </>
+                            )}
+                            {!consentAnalytics && (
+                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-[var(--text-muted)] flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                    <p>Analytics and visualizations are disabled. <a href="/settings" className="text-rose-500 hover:underline">Enable analytics in Settings</a> to see charts and trends.</p>
+                                </div>
+                            )}
+                            {consentAnalytics ? (
+                                <SemesterSummaryTable
+                                    data={processed}
+                                    onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
+                                />
+                            ) : (
+                                <SemesterSummaryTableRawOnly
                                     data={processed.map(p => ({
                                         semester: p.semester,
                                         semesterNumber: p.semesterNumber,
-                                        sgpa: p.sgpa,
-                                        totalSubjects: p.totalSubjects,
-                                        totalCredits: p.totalCredits,
+                                        subjects: processed.find(x => x.semesterNumber === p.semesterNumber)?.subjects.map(s => ({
+                                            papercode: s.code,
+                                            papername: s.name,
+                                            minorprint: String(s.internal_marks || 0),
+                                            majorprint: String(s.external_marks || 0),
+                                            moderatedprint: String(s.total_marks || 0),
+                                        })) || []
                                     }))}
                                     onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
                                 />
-                                <GradeDistributionChart grades={gradeDistribution} />
-                            </div>
-                            <SemesterMarksChart
-                                data={processed}
-                                onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
-                            />
-                            <SemesterSummaryTable
-                                data={processed}
-                                onSelectSemester={(semNum) => setActiveTab(`Sem ${semNum}`)}
-                            />
+                            )}
                         </>
                     ) : currentSemData ? (
                         <>
-                            <SemesterStats
-                                totalMarks={currentSemData.totalMarks}
-                                maxMarks={currentSemData.maxMarks}
-                                sgpa={currentSemData.sgpa}
-                                credits={currentSemData.totalCredits}
-                                semesterNumber={currentSemData.semesterNumber}
-                            />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                <GradeDistributionChart grades={semesterGradeDistribution} />
-                                <SubjectRadarChart data={radarData} />
-                            </div>
-                            <SubjectMarksStackedBarChart
-                                data={currentSemData.subjects.map(s => ({
-                                    subject: s.code,
-                                    subjectName: s.name,
-                                    internal: s.internal_marks || 0,
-                                    external: s.external_marks || 0,
-                                    total: s.total_marks || 0
-                                }))}
-                            />
-                            <ResultTable
-                                results={currentSemData.subjects.map(s => ({
-                                    papercode: s.code,
-                                    papername: s.name,
-                                    minorprint: String(s.internal_marks || 0),
-                                    majorprint: String(s.external_marks || 0),
-                                    moderatedprint: String(s.total_marks || 0),
-                                }))}
-                            />
+                            {consentAnalytics && (
+                                <>
+                                    <SemesterStats
+                                        totalMarks={currentSemData.totalMarks}
+                                        maxMarks={currentSemData.maxMarks}
+                                        sgpa={currentSemData.sgpa}
+                                        credits={currentSemData.totalCredits}
+                                        semesterNumber={currentSemData.semesterNumber}
+                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                        <GradeDistributionChart grades={semesterGradeDistribution} />
+                                        <SubjectRadarChart data={radarData} />
+                                    </div>
+                                    <SubjectMarksStackedBarChart
+                                        data={currentSemData.subjects.map(s => ({
+                                            subject: s.code,
+                                            subjectName: s.name,
+                                            internal: s.internal_marks || 0,
+                                            external: s.external_marks || 0,
+                                            total: s.total_marks || 0
+                                        }))}
+                                    />
+                                </>
+                            )}
+                            {!consentAnalytics && (
+                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-[var(--text-muted)] flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                    <p>Analytics and visualizations are disabled. <a href="/settings" className="text-rose-500 hover:underline">Enable analytics in Settings</a> to see charts and trends.</p>
+                                </div>
+                            )}
+                            {consentAnalytics ? (
+                                <ResultTable
+                                    results={currentSemData.subjects.map(s => ({
+                                        papercode: s.code,
+                                        papername: s.name,
+                                        minorprint: String(s.internal_marks || 0),
+                                        majorprint: String(s.external_marks || 0),
+                                        moderatedprint: String(s.total_marks || 0),
+                                    }))}
+                                />
+                            ) : (
+                                <ResultTableRawOnly
+                                    results={currentSemData.subjects.map(s => ({
+                                        papercode: s.code,
+                                        papername: s.name,
+                                        minorprint: String(s.internal_marks || 0),
+                                        majorprint: String(s.external_marks || 0),
+                                        moderatedprint: String(s.total_marks || 0),
+                                    }))}
+                                />
+                            )}
                         </>
                     ) : null}
                 </div>

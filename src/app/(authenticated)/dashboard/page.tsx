@@ -42,6 +42,7 @@ export default async function DashboardPage() {
         <DashboardClient
             student={student}
             records={(records as RecordWithSubjects[]) || []}
+            consentAnalytics={student.consent_analytics || false}
         />
     );
 }

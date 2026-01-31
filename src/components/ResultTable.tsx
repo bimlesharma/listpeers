@@ -12,6 +12,123 @@ interface SubjectData {
     moderatedprint: string;  // Total marks
 }
 
+export function ResultTableRawOnly({ results, className }: ResultTableProps) {
+    return (
+        <div className={cn("w-full overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] animate-fade-in-up card-hover hover:border-rose-500/30 transition-all duration-300", className)}>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--card-border)] flex items-center gap-2 sm:gap-3">
+                <div className="h-3 sm:h-4 w-1 bg-rose-500 rounded-full animate-glow-pulse" />
+                <h3 className="font-bold text-[var(--text-secondary)] text-xs sm:text-sm tracking-widest uppercase">Marks</h3>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full text-xs sm:text-sm text-left">
+                    <thead className="text-[10px] sm:text-xs text-[var(--text-muted)] uppercase bg-[var(--card-bg)] border-b border-[var(--card-border)]">
+                        <tr>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider">Code</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider hidden sm:table-cell">Subject Name</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider text-center hidden md:table-cell">Int</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider text-center hidden md:table-cell">Ext</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider text-center">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                        {results.map((result, index) => {
+                            const internal = parseInt(result.minorprint) || 0;
+                            const external = parseInt(result.majorprint) || 0;
+                            const obtained = parseInt(result.moderatedprint) || 0;
+
+                            const uniqueKey = result.papercode
+                                ? `${result.papercode}-${index}`
+                                : `subject-${result.papername || 'unknown'}-${index}`;
+
+                            return (
+                                <tr key={uniqueKey} className="hover:bg-[var(--hover-bg)] transition-colors">
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-[var(--text-secondary)] text-xs sm:text-sm">
+                                        {result.papercode || 'N/A'}
+                                    </td>
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-[var(--text-primary)] hidden sm:table-cell text-xs sm:text-sm">
+                                        {result.papername || 'Unknown Subject'}
+                                    </td>
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center text-[var(--text-secondary)] font-mono hidden md:table-cell">
+                                        {internal || '-'}
+                                    </td>
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center text-[var(--text-secondary)] font-mono hidden md:table-cell">
+                                        {external || '-'}
+                                    </td>
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center font-bold text-rose-500 text-sm sm:text-base">
+                                        {obtained}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+interface SemesterSummaryRawProps {
+    data: {
+        semester: string;
+        semesterNumber: number;
+        subjects: SubjectData[];
+    }[];
+    className?: string;
+    onSelectSemester?: (semesterNumber: number) => void;
+}
+
+export function SemesterSummaryTableRawOnly({ data, className, onSelectSemester }: SemesterSummaryRawProps) {
+    return (
+        <div className={cn("w-full overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] animate-fade-in-up card-hover hover:border-rose-500/30 transition-all duration-300", className)}>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--card-border)] flex items-center gap-2 sm:gap-3">
+                <div className="h-3 sm:h-4 w-1 bg-pink-500 rounded-full animate-glow-pulse" />
+                <h3 className="font-bold text-[var(--text-secondary)] text-xs sm:text-sm tracking-widest uppercase">Marks by Semester</h3>
+                {onSelectSemester && (
+                    <span className="text-[9px] sm:text-[10px] text-[var(--text-muted)] ml-auto hidden sm:block">Click row to view</span>
+                )}
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full text-xs sm:text-sm text-left">
+                    <thead className="text-[10px] sm:text-xs text-[var(--text-muted)] uppercase bg-[var(--card-bg)] border-b border-[var(--card-border)]">
+                        <tr>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider">Semester</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 font-bold tracking-wider text-center">Subjects</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                        {data.map((sem, index) => {
+                            return (
+                                <tr
+                                    key={`${sem.semester}-${index}`}
+                                    className={cn(
+                                        "transition-colors",
+                                        onSelectSemester
+                                            ? "hover:bg-rose-500/10 cursor-pointer group"
+                                            : "hover:bg-[var(--hover-bg)]"
+                                    )}
+                                    onClick={() => onSelectSemester?.(sem.semesterNumber)}
+                                >
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-[var(--text-primary)] group-hover:text-rose-400 transition-colors text-xs sm:text-sm">
+                                        {sem.semester}
+                                        {onSelectSemester && (
+                                            <span className="ml-1 sm:ml-2 text-[var(--text-muted)] group-hover:text-rose-400 text-[10px] sm:text-xs">→</span>
+                                        )}
+                                    </td>
+                                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center font-medium text-[var(--text-secondary)]">
+                                        {sem.subjects.length}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
 interface ResultTableProps {
     results: SubjectData[];
     className?: string;
