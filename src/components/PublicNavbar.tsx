@@ -68,7 +68,7 @@ export function PublicNavbar() {
                             );
                         })}
                         <a
-                            href="https://github.com/bimlesh1/peerlist"
+                            href="https://github.com/bimlesharma/peerlist"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-3 py-2 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--hover-bg) transition-colors"
@@ -136,7 +136,7 @@ export function PublicNavbar() {
                                 );
                             })}
                             <a
-                                href="https://github.com/bimlesh1/peerlist"
+                                href="https://github.com/bimlesharma/peerlist"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setMobileMenuOpen(false)}

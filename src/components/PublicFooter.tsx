@@ -35,7 +35,7 @@ export function PublicFooter() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-(--text-muted) text-sm">
                     <p>© {currentYear} PeerList • Student-Run • Open Source</p>
                     <span className="hidden sm:inline">•</span>
-                    <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-rose-500 transition-colors">
+                    <a href="https://github.com/bimlesharma/peerlist" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-rose-500 transition-colors">
                         <Github className="w-4 h-4" />
                         GitHub
                     </a>
