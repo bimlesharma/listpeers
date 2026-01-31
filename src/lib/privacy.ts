@@ -8,6 +8,7 @@ export interface MaskedIdentity {
     displayName: string;
     showAvatar: boolean;
     avatarFallback: string;
+    avatarUrl?: string;
 }
 
 /**
@@ -28,6 +29,7 @@ export function getMaskedIdentity(
                 displayName: 'Anonymous',
                 showAvatar: false,
                 avatarFallback: 'Anon',
+                avatarUrl: buildAbstractAvatarUrl(`anonymous-${enrollmentNo}`),
             };
 
         case 'pseudonymous':
@@ -37,6 +39,7 @@ export function getMaskedIdentity(
                 displayName: pseudonym,
                 showAvatar: false,
                 avatarFallback: pseudonym.substring(0, 2),
+                avatarUrl: buildAbstractAvatarUrl(pseudonym),
             };
 
         case 'visible':
@@ -51,6 +54,7 @@ export function getMaskedIdentity(
                 displayName: 'Student',
                 showAvatar: false,
                 avatarFallback: 'ST',
+                avatarUrl: buildAbstractAvatarUrl(`student-${enrollmentNo}`),
             };
     }
 }
@@ -62,6 +66,14 @@ export function getMaskedIdentity(
 function createPseudonym(enrollmentNo: string): string {
     const lastFour = enrollmentNo.slice(-4);
     return `Student-${lastFour}`;
+}
+
+/**
+ * Build a deterministic abstract avatar URL (DiceBear identicon)
+ */
+function buildAbstractAvatarUrl(seed: string): string {
+    const safeSeed = encodeURIComponent(seed);
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=${safeSeed}`;
 }
 
 /**

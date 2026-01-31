@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Student } from '@/types';
-import { Users, Lock, Loader2, Search, User, ExternalLink } from 'lucide-react';
+import { Users, Lock, Loader2, Search, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { getMaskedIdentity, getPseudonymAvatarColor, type DisplayMode } from '@/lib/privacy';
+import { getMaskedIdentity, type DisplayMode } from '@/lib/privacy';
 
 interface PeerData {
     id: string;
@@ -159,9 +159,6 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                             peer.enrollment_no,
                             peer.display_name
                         );
-                        const pseudonymColor = peer.display_mode !== 'visible' 
-                            ? getPseudonymAvatarColor(maskedIdentity.displayName)
-                            : 'bg-rose-500';
 
                         return (
                             <Link
@@ -177,8 +174,14 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                                             alt={peer.display_name || 'Student'}
                                             className="w-12 h-12 rounded-full object-cover border-2 border-rose-500/30"
                                         />
+                                    ) : maskedIdentity.avatarUrl ? (
+                                        <img
+                                            src={maskedIdentity.avatarUrl}
+                                            alt={maskedIdentity.displayName}
+                                            className="w-12 h-12 rounded-full object-cover border-2 border-rose-500/20"
+                                        />
                                     ) : (
-                                        <div className={`w-12 h-12 rounded-full ${pseudonymColor} flex items-center justify-center border-2 border-opacity-30 border-gray-300`}>
+                                        <div className="w-12 h-12 rounded-full bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center">
                                             <span className="text-xs font-bold text-white">
                                                 {maskedIdentity.avatarFallback}
                                             </span>

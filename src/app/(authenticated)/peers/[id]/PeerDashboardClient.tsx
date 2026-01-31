@@ -5,12 +5,12 @@ import { ResultTable, SemesterSummaryTable } from '@/components/ResultTable';
 import { SemesterStats, OverallStats } from '@/components/SemesterStats';
 import { SGPATrendChart, GradeDistributionChart, SubjectRadarChart, SemesterMarksChart } from '@/components/PerformanceCharts';
 import { SubjectMarksStackedBarChart } from '@/components/SubjectMarksStackedBarChart';
-import { ArrowLeft, User, Lock } from 'lucide-react';
+import { ArrowLeft, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { marksToGrade, calculateSGPA, calculateCGPA, getGradeDistribution, getSemesterName } from '@/lib/grading';
 import type { AcademicRecord, Subject } from '@/types';
 import Link from 'next/link';
-import { getMaskedIdentity, getPseudonymAvatarColor, type DisplayMode } from '@/lib/privacy';
+import { getMaskedIdentity, type DisplayMode } from '@/lib/privacy';
 
 interface RecordWithSubjects extends AcademicRecord {
     subjects: Subject[];
@@ -78,9 +78,6 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
         peer.enrollment_no,
         peer.display_name
     );
-    const pseudonymColor = peer.display_mode !== 'visible' 
-        ? getPseudonymAvatarColor(maskedIdentity.displayName)
-        : 'bg-rose-500';
 
     // Peer info
     const peerName = maskedIdentity.displayName;
@@ -144,10 +141,19 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                                     className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border-2 border-rose-500/30"
                                 />
                             </div>
+                        ) : maskedIdentity.avatarUrl ? (
+                            <div className="relative flex-shrink-0">
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
+                                <img
+                                    src={maskedIdentity.avatarUrl}
+                                    alt={peerName}
+                                    className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border-2 border-rose-500/20"
+                                />
+                            </div>
                         ) : (
                             <div className="relative flex-shrink-0">
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
-                                <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl ${pseudonymColor} border-2 border-opacity-30 border-gray-300 flex items-center justify-center`}>
+                                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center">
                                     <span className="text-lg sm:text-xl font-bold text-white">
                                         {maskedIdentity.avatarFallback}
                                     </span>
