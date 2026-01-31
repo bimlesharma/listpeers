@@ -22,7 +22,7 @@ interface SGPATrendChartProps {
 export function SGPATrendChart({ data }: SGPATrendChartProps) {
     return (
         <div className="card p-6">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+            <h3 className="text-lg font-semibold text-(--text-primary) mb-4">
                 SGPA Trend
             </h3>
             <div className="h-64">
@@ -74,7 +74,7 @@ export function GradeDistributionChart({ data }: GradeDistributionChartProps) {
 
     return (
         <div className="card p-6">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+            <h3 className="text-lg font-semibold text-(--text-primary) mb-4">
                 Grade Distribution
             </h3>
             <div className="h-64 flex items-center">
@@ -120,7 +120,7 @@ export function GradeDistributionChart({ data }: GradeDistributionChartProps) {
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: item.color }}
                         />
-                        <span className="text-xs text-[var(--text-secondary)]">
+                        <span className="text-xs text-(--text-secondary)">
                             {item.grade}: {item.count}
                         </span>
                     </div>
@@ -137,7 +137,7 @@ interface SemesterCreditsChartProps {
 export function SemesterCreditsChart({ data }: SemesterCreditsChartProps) {
     return (
         <div className="card p-6">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+            <h3 className="text-lg font-semibold text-(--text-primary) mb-4">
                 Credits per Semester
             </h3>
             <div className="h-64">

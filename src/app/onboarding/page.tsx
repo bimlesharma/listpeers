@@ -417,13 +417,13 @@ export default function OnboardingPage() {
                             <GraduationCap className="w-8 h-8 text-[var(--primary)]" />
                             <h1 className="text-2xl font-bold text-gradient">PeerList</h1>
                         </div>
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)]">
+                        <h2 className="text-xl font-semibold text-(--text-primary)">
                             {step === 'ipu-login' && 'Verify Your Identity'}
                             {step === 'fetching' && 'Fetching Your Results'}
                             {step === 'review' && 'Review Your Data'}
                             {step === 'consent' && 'Privacy Settings'}
                         </h2>
-                        <p className="text-[var(--text-secondary)] mt-2">
+                        <p className="text-(--text-secondary) mt-2">
                             {step === 'ipu-login' && 'Login with your official IPU portal credentials'}
                             {step === 'fetching' && 'Please wait while we fetch your academic records'}
                             {step === 'review' && 'Confirm your academic data before proceeding'}
@@ -433,7 +433,7 @@ export default function OnboardingPage() {
 
                     {error && (
                         <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-[var(--error)] bg-opacity-10 text-[var(--error)] animate-fade-in">
-                            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                            <AlertCircle className="w-5 h-5 shrink-0" />
                             <p className="text-sm">{error}</p>
                         </div>
                     )}
@@ -442,12 +442,12 @@ export default function OnboardingPage() {
                     {step === 'ipu-login' && (
                         <form onSubmit={handleIPULogin} className="card p-6 space-y-4 animate-fade-in-up stagger-1">
                             <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                                <ShieldCheck className="w-5 h-5 flex-shrink-0 text-rose-500" />
-                                <p className="text-sm text-[var(--text-primary)]">Your credentials are sent directly to the official IPU server and are never stored.</p>
+                                <ShieldCheck className="w-5 h-5 shrink-0 text-rose-500" />
+                                <p className="text-sm text-(--text-primary)">Your credentials are sent directly to the official IPU server and are never stored.</p>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                                <label className="block text-sm font-medium text-(--text-primary) mb-1.5">
                                     Enrollment Number
                                 </label>
                                 <input
@@ -462,7 +462,7 @@ export default function OnboardingPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                                <label className="block text-sm font-medium text-(--text-primary) mb-1.5">
                                     IPU Portal Password
                                 </label>
                                 <input
@@ -477,7 +477,7 @@ export default function OnboardingPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                                <label className="block text-sm font-medium text-(--text-primary) mb-1.5">
                                     Captcha
                                 </label>
                                 <div className="flex items-center gap-2 mb-2">
@@ -485,18 +485,18 @@ export default function OnboardingPage() {
                                         <img
                                             src={captchaImage}
                                             alt="Captcha"
-                                            className="h-10 rounded border border-[var(--card-border)]"
+                                            className="h-10 rounded border border-(--card-border)"
                                         />
                                     ) : (
-                                        <div className="h-10 w-24 bg-[var(--secondary)] rounded border border-[var(--card-border)] flex items-center justify-center">
-                                            <Loader2 className="w-4 h-4 animate-spin text-[var(--text-secondary)]" />
+                                        <div className="h-10 w-24 bg-secondary rounded border border-(--card-border) flex items-center justify-center">
+                                            <Loader2 className="w-4 h-4 animate-spin text-(--text-secondary)" />
                                         </div>
                                     )}
                                     <button
                                         type="button"
                                         onClick={fetchCaptcha}
                                         disabled={loading}
-                                        className="p-2 text-[var(--text-secondary)] hover:text-rose-500 transition-colors rounded-lg hover:bg-[var(--hover-bg)]"
+                                        className="p-2 text-(--text-secondary) hover:text-rose-500 transition-colors rounded-lg hover:bg-(--hover-bg)"
                                         title="Refresh captcha"
                                     >
                                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -538,7 +538,7 @@ export default function OnboardingPage() {
                         <div className="card p-8 animate-fade-in-up">
                             <div className="flex flex-col items-center justify-center">
                                 <Loader2 className="w-12 h-12 animate-spin text-rose-500 mb-4" />
-                                <p className="text-[var(--text-primary)] text-center font-medium">{fetchProgress}</p>
+                                <p className="text-(--text-primary) text-center font-medium">{fetchProgress}</p>
                             </div>
                         </div>
                     )}
@@ -546,54 +546,54 @@ export default function OnboardingPage() {
                     {/* Step 3: Review */}
                     {step === 'review' && (
                         <div className="card p-6 space-y-4 animate-fade-in-up stagger-1">
-                            <div className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
-                                <h3 className="font-semibold text-[var(--text-primary)] mb-2">{studentName}</h3>
+                            <div className="p-4 rounded-lg bg-secondary border border-(--card-border)">
+                                <h3 className="font-semibold text-(--text-primary) mb-2">{studentName}</h3>
                                 <div className="space-y-1.5 text-sm">
-                                    <p className="text-[var(--text-primary)]">
-                                        <span className="text-[var(--text-secondary)]">Enrollment:</span> {enrollmentNo}
+                                    <p className="text-(--text-primary)">
+                                        <span className="text-(--text-secondary)">Enrollment:</span> {enrollmentNo}
                                     </p>
                                     {studentInstitute && (
-                                        <p className="text-[var(--text-primary)]">
-                                            <span className="text-[var(--text-secondary)]">Institute:</span> {studentInstitute}
+                                        <p className="text-(--text-primary)">
+                                            <span className="text-(--text-secondary)">Institute:</span> {studentInstitute}
                                         </p>
                                     )}
                                     {studentProgram && (
-                                        <p className="text-[var(--text-primary)]">
-                                            <span className="text-[var(--text-secondary)]">Program:</span> {studentProgram}
+                                        <p className="text-(--text-primary)">
+                                            <span className="text-(--text-secondary)">Program:</span> {studentProgram}
                                         </p>
                                     )}
                                     {studentBatch && (
-                                        <p className="text-[var(--text-primary)]">
-                                            <span className="text-[var(--text-secondary)]">Batch:</span> {studentBatch}
+                                        <p className="text-(--text-primary)">
+                                            <span className="text-(--text-secondary)">Batch:</span> {studentBatch}
                                         </p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <h4 className="text-sm font-semibold text-[var(--text-primary)]">
+                                <h4 className="text-sm font-semibold text-(--text-primary)">
                                     Academic Records Found
                                 </h4>
                                 <div className="grid grid-cols-2 gap-2">
-                                    <div className="p-3 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] text-center">
+                                    <div className="p-3 rounded-lg bg-secondary border border-(--card-border) text-center">
                                         <p className="text-2xl font-bold text-rose-500">{semesterResults.length}</p>
-                                        <p className="text-xs font-medium text-[var(--text-secondary)]">Semesters</p>
+                                        <p className="text-xs font-medium text-(--text-secondary)">Semesters</p>
                                     </div>
-                                    <div className="p-3 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] text-center">
+                                    <div className="p-3 rounded-lg bg-secondary border border-(--card-border) text-center">
                                         <p className="text-2xl font-bold text-rose-500">{totalSubjects}</p>
-                                        <p className="text-xs font-medium text-[var(--text-secondary)]">Subjects</p>
+                                        <p className="text-xs font-medium text-(--text-secondary)">Subjects</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="max-h-48 overflow-y-auto space-y-2">
                                 {semesterResults.map((sem) => (
-                                    <div key={sem.semester} className="p-3 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                    <div key={sem.semester} className="p-3 rounded-lg bg-secondary border border-(--card-border)">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-[var(--text-primary)]">
+                                            <span className="text-sm font-medium text-(--text-primary)">
                                                 Semester {sem.semester}
                                             </span>
-                                            <span className="text-xs font-medium text-[var(--text-secondary)]">
+                                            <span className="text-xs font-medium text-(--text-secondary)">
                                                 {sem.subjects.length} subjects
                                             </span>
                                         </div>
@@ -615,17 +615,17 @@ export default function OnboardingPage() {
                     {step === 'consent' && (
                         <div className="card p-6 space-y-6 animate-fade-in-up stagger-1">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                                <h3 className="text-sm font-semibold text-(--text-primary)">
                                     Privacy & Sharing Settings
                                 </h3>
 
                                 {/* Analytics Toggle */}
-                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-secondary border border-(--card-border)">
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-[var(--text-primary)]">
+                                        <p className="text-sm font-medium text-(--text-primary)">
                                             Personal Analytics
                                         </p>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                        <p className="text-xs text-(--text-secondary) mt-1">
                                             View your SGPA/CGPA trends and grade distributions
                                         </p>
                                     </div>
@@ -647,12 +647,12 @@ export default function OnboardingPage() {
                                 </div>
 
                                 {/* Rankboard Toggle */}
-                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-secondary border border-(--card-border)">
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-[var(--text-primary)]">
+                                        <p className="text-sm font-medium text-(--text-primary)">
                                             Rankboard (College Leaderboard)
                                         </p>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                        <p className="text-xs text-(--text-secondary) mt-1">
                                             Compare CGPA with peers from your college
                                         </p>
                                     </div>
@@ -674,12 +674,12 @@ export default function OnboardingPage() {
                                 </div>
 
                                 {/* Peers/Marks Visibility Toggle */}
-                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                                <div className="flex items-start justify-between gap-4 p-4 rounded-lg bg-secondary border border-(--card-border)">
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-[var(--text-primary)]">
+                                        <p className="text-sm font-medium text-(--text-primary)">
                                             Share Marks with Peers
                                         </p>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                        <p className="text-xs text-(--text-secondary) mt-1">
                                             View and compare detailed marks with classmates from your college
                                         </p>
                                     </div>
@@ -701,8 +701,8 @@ export default function OnboardingPage() {
                                 </div>
 
                                 {/* Display Mode Selector */}
-                                <div className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
-                                    <p className="text-sm font-medium text-[var(--text-primary)] mb-3">
+                                <div className="p-4 rounded-lg bg-secondary border border-(--card-border)">
+                                    <p className="text-sm font-medium text-(--text-primary) mb-3">
                                         Identity Display
                                     </p>
                                     <div className="space-y-2">
@@ -716,8 +716,8 @@ export default function OnboardingPage() {
                                                 className="w-4 h-4 text-rose-500 focus:ring-rose-500"
                                             />
                                             <div>
-                                                <span className="text-sm text-[var(--text-primary)]">Anonymous</span>
-                                                <p className="text-xs text-[var(--text-secondary)]">Your name is hidden</p>
+                                                <span className="text-sm text-(--text-primary)">Anonymous</span>
+                                                <p className="text-xs text-(--text-secondary)">Your name is hidden</p>
                                             </div>
                                         </label>
                                         <label className="flex items-center gap-3 cursor-pointer">
@@ -730,8 +730,8 @@ export default function OnboardingPage() {
                                                 className="w-4 h-4 text-rose-500 focus:ring-rose-500"
                                             />
                                             <div>
-                                                <span className="text-sm text-[var(--text-primary)]">Pseudonymous</span>
-                                                <p className="text-xs text-[var(--text-secondary)]">Show as "Student-XXXXXX"</p>
+                                                <span className="text-sm text-(--text-primary)">Pseudonymous</span>
+                                                <p className="text-xs text-(--text-secondary)">Show as "Student-XXXXXX"</p>
                                             </div>
                                         </label>
                                         <label className="flex items-center gap-3 cursor-pointer">
@@ -744,16 +744,16 @@ export default function OnboardingPage() {
                                                 className="w-4 h-4 text-rose-500 focus:ring-rose-500"
                                             />
                                             <div>
-                                                <span className="text-sm text-[var(--text-primary)]">Visible</span>
-                                                <p className="text-xs text-[var(--text-secondary)]">Show your real name</p>
+                                                <span className="text-sm text-(--text-primary)">Visible</span>
+                                                <p className="text-xs text-(--text-secondary)">Show your real name</p>
                                             </div>
                                         </label>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-[var(--card-border)]">
-                                <div className="flex items-start gap-3 p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                            <div className="pt-4 border-t border-(--card-border)">
+                                <div className="flex items-start gap-3 p-4 rounded-lg bg-secondary border border-(--card-border)">
                                     <button
                                         type="button"
                                         role="checkbox"
@@ -770,10 +770,10 @@ export default function OnboardingPage() {
                                         )}
                                     </button>
                                     <div>
-                                        <p className="text-sm font-medium text-[var(--text-primary)]">
+                                        <p className="text-sm font-medium text-(--text-primary)">
                                             I acknowledge voluntary submission <span className="text-rose-500">*</span>
                                         </p>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                        <p className="text-xs text-(--text-secondary) mt-1">
                                             I understand that I am submitting my academic data voluntarily and
                                             this platform is not affiliated with any university.
                                         </p>

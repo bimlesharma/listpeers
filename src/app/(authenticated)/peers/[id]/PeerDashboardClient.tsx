@@ -117,14 +117,14 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
     })() : [];
 
     return (
-        <main className="min-h-screen bg-[var(--background)]">
+        <main className="min-h-screen bg-background">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-16 sm:pb-20">
                 {/* Header */}
-                <div className="bg-[var(--background)] pt-4 sm:pt-8 pb-4 sm:pb-6 border-b border-[var(--card-border)]">
+                <div className="bg-background pt-4 sm:pt-8 pb-4 sm:pb-6 border-b border-(--card-border)">
                     {/* Back button */}
                     <Link
                         href="/peers"
-                        className="inline-flex items-center gap-2 text-[var(--text-muted)] hover:text-rose-500 transition-colors mb-4"
+                        className="inline-flex items-center gap-2 text-(--text-muted) hover:text-rose-500 transition-colors mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="text-sm">Back to Peers</span>
@@ -133,8 +133,8 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                     <div className="flex items-start gap-4 animate-fade-in-up">
                         {/* Avatar */}
                         {maskedIdentity.showAvatar && peer.avatar_url ? (
-                            <div className="relative flex-shrink-0">
-                                <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-30" />
+                            <div className="relative shrink-0">
+                                <div className="absolute -inset-0.5 bg-linear-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-30" />
                                 <img
                                     src={peer.avatar_url}
                                     alt={peerName}
@@ -142,8 +142,8 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                                 />
                             </div>
                         ) : maskedIdentity.avatarUrl ? (
-                            <div className="relative flex-shrink-0">
-                                <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
+                            <div className="relative shrink-0">
+                                <div className="absolute -inset-0.5 bg-linear-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
                                 <img
                                     src={maskedIdentity.avatarUrl}
                                     alt={peerName}
@@ -151,8 +151,8 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                                 />
                             </div>
                         ) : (
-                            <div className="relative flex-shrink-0">
-                                <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
+                            <div className="relative shrink-0">
+                                <div className="absolute -inset-0.5 bg-linear-to-r from-rose-500 to-pink-500 rounded-xl blur opacity-20" />
                                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-rose-500/10 border-2 border-rose-500/30 flex items-center justify-center">
                                     <span className="text-lg sm:text-xl font-bold text-white">
                                         {maskedIdentity.avatarFallback}
@@ -164,18 +164,18 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                         {/* Info */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                                <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] truncate">
+                                <h1 className="text-xl sm:text-2xl font-bold text-(--text-primary) truncate">
                                     {peerName}
                                 </h1>
                                 {peer.display_mode !== 'visible' && (
-                                    <div title={`Privacy mode: ${peer.display_mode}`} className="flex-shrink-0">
-                                        <Lock className="w-5 h-5 text-[var(--text-muted)] opacity-70" />
+                                    <div title={`Privacy mode: ${peer.display_mode}`} className="shrink-0">
+                                        <Lock className="w-5 h-5 text-(--text-muted) opacity-70" />
                                     </div>
                                 )}
                             </div>
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {program && (
-                                    <span className="px-2 py-0.5 text-xs font-medium bg-[var(--secondary)] text-[var(--text-secondary)] rounded-md">
+                                    <span className="px-2 py-0.5 text-xs font-medium bg-secondary text-(--text-secondary) rounded-md">
                                         {program}
                                     </span>
                                 )}
@@ -189,7 +189,7 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                     </div>
 
                     {institute && (
-                        <p className="text-sm text-[var(--text-muted)] mt-3">
+                        <p className="text-sm text-(--text-muted) mt-3">
                             {institute}
                         </p>
                     )}
@@ -197,7 +197,7 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
 
                 {!hasData ? (
                     <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 animate-fade-in-up px-4 py-12">
-                        <p className="text-[var(--text-secondary)] text-center">
+                        <p className="text-(--text-secondary) text-center">
                             No academic data available for this student.
                         </p>
                     </div>
@@ -213,7 +213,7 @@ export function PeerDashboardClient({ peer, records }: PeerDashboardClientProps)
                                         "px-1 sm:px-5 py-2 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap",
                                         activeTab === tab
                                             ? "bg-rose-600 text-white shadow-lg shadow-rose-600/30 sm:scale-105"
-                                            : "bg-[var(--secondary)] text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)] border border-[var(--card-border)] hover:border-rose-500/30"
+                                            : "bg-secondary text-(--text-muted) hover:bg-(--hover-bg) hover:text-(--text-primary) border border-(--card-border) hover:border-rose-500/30"
                                     )}
                                     style={{ animationDelay: `${index * 0.05}s` }}
                                 >

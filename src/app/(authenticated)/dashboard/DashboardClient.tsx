@@ -113,8 +113,8 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
                         <AlertCircle className="relative w-12 h-12 sm:w-16 sm:h-16 text-rose-500" />
                     </div>
                     <div className="text-center">
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">No Academic Data Found</h2>
-                        <p className="text-[var(--text-secondary)] max-w-md mx-auto">
+                        <h2 className="text-xl font-semibold text-(--text-primary) mb-2">No Academic Data Found</h2>
+                        <p className="text-(--text-secondary) max-w-md mx-auto">
                             Your academic records may not have been fetched properly during registration.
                             Please contact support if you believe this is an error.
                         </p>
@@ -125,7 +125,7 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
     }
 
     return (
-        <main className="min-h-screen bg-[var(--background)]">
+        <main className="min-h-screen bg-background">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-16 sm:pb-20">
                 <DashboardHeader
                     studentName={studentName}
@@ -147,7 +147,7 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
                                 "px-1 sm:px-5 py-2 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap btn-shine ripple",
                                 activeTab === tab
                                     ? "bg-rose-600 text-white shadow-lg shadow-rose-600/30 sm:scale-105"
-                                    : "bg-[var(--secondary)] text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)] border border-[var(--card-border)] hover:border-rose-500/30 sm:hover:scale-102"
+                                    : "bg-secondary text-(--text-muted) hover:bg-(--hover-bg) hover:text-(--text-primary) border border-(--card-border) hover:border-rose-500/30 sm:hover:scale-102"
                             )}
                             style={{ animationDelay: `${index * 0.05}s` }}
                         >
@@ -192,8 +192,8 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
                                 </>
                             )}
                             {!consentAnalytics && (
-                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-[var(--text-muted)] flex items-start gap-3">
-                                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-(--text-muted) flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                                     <p>Analytics and visualizations are disabled. <a href="/settings" className="text-rose-500 hover:underline">Enable analytics in Settings</a> to see charts and trends.</p>
                                 </div>
                             )}
@@ -246,8 +246,8 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
                                 </>
                             )}
                             {!consentAnalytics && (
-                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-[var(--text-muted)] flex items-start gap-3">
-                                    <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-(--text-muted) flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                                     <p>Analytics and visualizations are disabled. <a href="/settings" className="text-rose-500 hover:underline">Enable analytics in Settings</a> to see charts and trends.</p>
                                 </div>
                             )}

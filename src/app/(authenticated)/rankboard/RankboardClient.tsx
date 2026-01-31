@@ -82,19 +82,19 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                     <div className="p-4 rounded-full bg-rose-500/10 w-fit mx-auto mb-4">
                         <Lock className="w-10 h-10 text-rose-500" />
                     </div>
-                    <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+                    <h1 className="text-2xl font-bold text-(--text-primary) mb-2">
                         Rankboard Access
                     </h1>
-                    <p className="text-[var(--text-secondary)] mb-6 max-w-md mx-auto">
+                    <p className="text-(--text-secondary) mb-6 max-w-md mx-auto">
                         To view and participate in the rankboard, you need to share your academic data.
                         This is a fair-trade model: you share to see, others share to be seen.
                     </p>
 
-                    <div className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] mb-6 text-left">
-                        <h3 className="font-medium text-[var(--text-primary)] mb-2">
+                    <div className="p-4 rounded-lg bg-secondary border border-(--card-border) mb-6 text-left">
+                        <h3 className="font-medium text-(--text-primary) mb-2">
                             What happens when you opt in:
                         </h3>
-                        <ul className="text-sm text-[var(--text-secondary)] space-y-2">
+                        <ul className="text-sm text-(--text-secondary) space-y-2">
                             <li className="flex items-start gap-2">
                                 <span className="text-emerald-500">✓</span>
                                 Your CGPA appears on the rankboard
@@ -132,7 +132,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                         )}
                     </button>
 
-                    <p className="text-xs text-[var(--text-muted)] mt-4">
+                    <p className="text-xs text-(--text-muted) mt-4">
                         By opting in, you agree to share your anonymized academic performance.
                     </p>
                 </div>
@@ -144,32 +144,32 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
         <div className="max-w-5xl mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8 animate-fade-in-up">
                 <div>
-                    <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+                    <h1 className="text-2xl font-bold text-(--text-primary)">
                         Rankboard
                     </h1>
-                    <p className="text-[var(--text-secondary)] mt-1">
+                    <p className="text-(--text-secondary) mt-1">
                         {filteredData.length} participant{filteredData.length !== 1 ? 's' : ''}
                         {hasActiveFilters && ' (filtered)'}
                     </p>
                 </div>
-                <Link href="/settings" className="text-sm text-[var(--text-muted)] hover:text-rose-500 transition-colors">
+                <Link href="/settings" className="text-sm text-(--text-muted) hover:text-rose-500 transition-colors">
                     Manage participation →
                 </Link>
             </div>
 
             {/* Filters */}
-            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 mb-6 animate-fade-in-up stagger-1">
+            <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-4 mb-6 animate-fade-in-up stagger-1">
                 <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2">
                         <Filter className="w-4 h-4 text-rose-500" />
-                        <span className="text-sm font-medium text-[var(--text-primary)]">Filters:</span>
+                        <span className="text-sm font-medium text-(--text-primary)">Filters:</span>
                     </div>
 
                     {batches.length > 0 && (
                         <select
                             value={batchFilter}
                             onChange={(e) => setBatchFilter(e.target.value)}
-                            className="bg-[var(--input-bg)] border border-[var(--card-border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] focus:border-rose-500 focus:outline-none transition-colors"
+                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
                         >
                             <option value="all">All Batches</option>
                             {batches.map(b => (
@@ -182,7 +182,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                         <select
                             value={branchFilter}
                             onChange={(e) => setBranchFilter(e.target.value)}
-                            className="bg-[var(--input-bg)] border border-[var(--card-border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] focus:border-rose-500 focus:outline-none transition-colors"
+                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
                         >
                             <option value="all">All Branches</option>
                             {branches.map(b => (
@@ -195,7 +195,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                         <select
                             value={collegeFilter}
                             onChange={(e) => setCollegeFilter(e.target.value)}
-                            className="bg-[var(--input-bg)] border border-[var(--card-border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] focus:border-rose-500 focus:outline-none transition-colors"
+                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
                         >
                             <option value="all">All Colleges</option>
                             {colleges.map(c => (
@@ -218,16 +218,16 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
 
             {/* Rankboard Table */}
             {filteredData.length > 0 ? (
-                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl overflow-hidden animate-fade-in-up stagger-2">
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl overflow-hidden animate-fade-in-up stagger-2">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-[var(--card-border)] bg-[var(--secondary)]">
-                                    <th className="w-20 px-4 py-4 text-left text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Rank</th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Student</th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider hidden sm:table-cell">Batch</th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider hidden md:table-cell">Branch</th>
-                                    <th className="px-4 py-4 text-right text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">CGPA</th>
+                                <tr className="border-b border-(--card-border) bg-secondary">
+                                    <th className="w-20 px-4 py-4 text-left text-xs font-bold text-(--text-primary) uppercase tracking-wider">Rank</th>
+                                    <th className="px-4 py-4 text-left text-xs font-bold text-(--text-primary) uppercase tracking-wider">Student</th>
+                                    <th className="px-4 py-4 text-left text-xs font-bold text-(--text-primary) uppercase tracking-wider hidden sm:table-cell">Batch</th>
+                                    <th className="px-4 py-4 text-left text-xs font-bold text-(--text-primary) uppercase tracking-wider hidden md:table-cell">Branch</th>
+                                    <th className="px-4 py-4 text-right text-xs font-bold text-(--text-primary) uppercase tracking-wider">CGPA</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--card-border)]">
@@ -240,7 +240,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                             key={entry.student_id}
                                             className={`transition-colors ${isCurrentUser
                                                 ? 'bg-rose-500/10 hover:bg-rose-500/15'
-                                                : 'hover:bg-[var(--hover-bg)]'
+                                                : 'hover:bg-(--hover-bg)'
                                             }`}
                                         >
                                             <td className="px-4 py-4">
@@ -260,7 +260,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                                             />
                                                         </div>
                                                     ) : (
-                                                        <span className="w-8 h-8 flex items-center justify-center text-sm font-bold text-[var(--text-primary)]">
+                                                        <span className="w-8 h-8 flex items-center justify-center text-sm font-bold text-(--text-primary)">
                                                             {rank}
                                                         </span>
                                                     )}
@@ -268,7 +268,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`font-semibold ${isCurrentUser ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>
+                                                    <span className={`font-semibold ${isCurrentUser ? 'text-rose-500' : 'text-(--text-primary)'}`}>
                                                         {entry.display_name || 'Anonymous'}
                                                     </span>
                                                     {isCurrentUser && (
@@ -278,10 +278,10 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-[var(--text-primary)] hidden sm:table-cell">
+                                            <td className="px-4 py-4 text-sm text-(--text-primary) hidden sm:table-cell">
                                                 {entry.batch || '-'}
                                             </td>
-                                            <td className="px-4 py-4 text-sm text-[var(--text-primary)] hidden md:table-cell">
+                                            <td className="px-4 py-4 text-sm text-(--text-primary) hidden md:table-cell">
                                                 {entry.branch || '-'}
                                             </td>
                                             <td className="px-4 py-4 text-right">
@@ -289,7 +289,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                                     entry.cgpa >= 9 ? 'text-yellow-500' :
                                                     entry.cgpa >= 8 ? 'text-rose-500' :
                                                     entry.cgpa >= 7 ? 'text-purple-500' :
-                                                    'text-[var(--text-primary)]'
+                                                    'text-(--text-primary)'
                                                 }`}>
                                                     {entry.cgpa.toFixed(2)}
                                                 </span>
@@ -302,14 +302,14 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                     </div>
                 </div>
             ) : (
-                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-12 text-center animate-fade-in-up stagger-3">
-                    <div className="p-4 rounded-full bg-[var(--secondary)] w-fit mx-auto mb-4">
-                        <Users className="w-10 h-10 text-[var(--text-muted)]" />
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-12 text-center animate-fade-in-up stagger-3">
+                    <div className="p-4 rounded-full bg-secondary w-fit mx-auto mb-4">
+                        <Users className="w-10 h-10 text-(--text-muted)" />
                     </div>
-                    <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+                    <h2 className="text-xl font-semibold text-(--text-primary) mb-2">
                         {hasActiveFilters ? 'No Matching Participants' : 'No Participants Yet'}
                     </h2>
-                    <p className="text-[var(--text-secondary)] max-w-md mx-auto">
+                    <p className="text-(--text-secondary) max-w-md mx-auto">
                         {hasActiveFilters
                             ? 'Try adjusting your filters or clear them to see all participants.'
                             : 'Be the first to opt-in and share this platform with your classmates!'
@@ -327,7 +327,7 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
             )}
 
             {/* Disclaimer */}
-            <p className="text-xs text-center text-[var(--text-muted)] mt-6">
+            <p className="text-xs text-center text-(--text-muted) mt-6">
                 Rankings are based on voluntarily submitted data and do not represent official academic standings.
             </p>
         </div>

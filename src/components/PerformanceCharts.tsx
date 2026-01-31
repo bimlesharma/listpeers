@@ -76,12 +76,12 @@ export function SGPATrendChart({ data, className, onSelectSemester }: Performanc
     };
 
     return (
-        <div className={cn('bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
+        <div className={cn('bg-(--card-bg) rounded-xl p-4 sm:p-6 border border-(--card-border) animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="h-3 sm:h-4 w-1 bg-pink-500 rounded-full animate-glow-pulse" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">GPA Trend</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-(--text-secondary) uppercase tracking-widest">GPA Trend</h3>
                 {onSelectSemester && (
-                    <span className="text-[9px] sm:text-[10px] text-[var(--text-muted)] ml-auto hidden sm:block">Click point to view</span>
+                    <span className="text-[9px] sm:text-[10px] text-(--text-muted) ml-auto hidden sm:block">Click point to view</span>
                 )}
             </div>
 
@@ -181,17 +181,17 @@ export function GradeDistributionChart({ grades, className }: GradeDistributionP
     const hoveredInfo = hoveredGrade ? sortedGrades.find(g => g.grade === hoveredGrade) : null;
 
     return (
-        <div className={cn('bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
+        <div className={cn('bg-(--card-bg) rounded-xl p-4 sm:p-6 border border-(--card-border) animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="h-3 sm:h-4 w-1 bg-rose-500 rounded-full" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">Grade Distribution</h3>
-                <span className="text-[9px] sm:text-[10px] text-[var(--text-muted)] ml-auto hidden sm:block">Hover to explore</span>
+                <h3 className="text-xs sm:text-sm font-bold text-(--text-secondary) uppercase tracking-widest">Grade Distribution</h3>
+                <span className="text-[9px] sm:text-[10px] text-(--text-muted) ml-auto hidden sm:block">Hover to explore</span>
             </div>
 
             {sortedGrades.length > 0 ? (
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     {/* Concentric Rings */}
-                    <div className="relative flex-shrink-0">
+                    <div className="relative shrink-0">
                         <svg width={size} height={size} className="w-48 h-48 sm:w-[280px] sm:h-[280px]" viewBox={`0 0 ${size} ${size}`}>
                             {/* Center background circle */}
                             <circle
@@ -272,17 +272,17 @@ export function GradeDistributionChart({ grades, className }: GradeDistributionP
                                         >
                                             {hoveredInfo.count}
                                         </div>
-                                        <div className="text-[10px] sm:text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wide">
+                                        <div className="text-[10px] sm:text-xs text-(--text-secondary) font-bold uppercase tracking-wide">
                                             {hoveredInfo.grade}
                                         </div>
-                                        <div className="text-[8px] sm:text-[10px] text-[var(--text-muted)] mt-0.5">
+                                        <div className="text-[8px] sm:text-[10px] text-(--text-muted) mt-0.5">
                                             {Math.round((hoveredInfo.count / totalSubjects) * 100)}%
                                         </div>
                                     </>
                                 ) : (
                                     <>
-                                        <div className="text-2xl sm:text-3xl font-black text-[var(--text-primary)]">{totalSubjects}</div>
-                                        <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-bold">Subjects</div>
+                                        <div className="text-2xl sm:text-3xl font-black text-(--text-primary)">{totalSubjects}</div>
+                                        <div className="text-[9px] sm:text-[10px] text-(--text-muted) uppercase tracking-widest font-bold">Subjects</div>
                                     </>
                                 )}
                             </div>
@@ -302,13 +302,13 @@ export function GradeDistributionChart({ grades, className }: GradeDistributionP
                                     key={item.grade}
                                     className={cn(
                                         "flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-all cursor-pointer",
-                                        isHovered ? "bg-rose-500/10 border border-rose-500/30" : "border border-transparent hover:bg-[var(--hover-bg)]"
+                                        isHovered ? "bg-rose-500/10 border border-rose-500/30" : "border border-transparent hover:bg-(--hover-bg)"
                                     )}
                                     onMouseEnter={() => setHoveredGrade(item.grade)}
                                     onMouseLeave={() => setHoveredGrade(null)}
                                 >
                                     <div
-                                        className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0"
+                                        className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0"
                                         style={{
                                             backgroundColor: color,
                                             boxShadow: isHovered ? `0 0 8px ${color}` : 'none'
@@ -316,12 +316,12 @@ export function GradeDistributionChart({ grades, className }: GradeDistributionP
                                     />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">{item.grade}</span>
+                                            <span className="text-xs sm:text-sm font-bold text-(--text-primary)">{item.grade}</span>
                                             <span className="text-xs sm:text-sm font-bold text-rose-500">{item.count}</span>
                                         </div>
                                         <div className="hidden sm:flex items-center justify-between">
-                                            <span className="text-[10px] text-[var(--text-muted)] uppercase">{label}</span>
-                                            <span className="text-[10px] text-[var(--text-muted)]">{percentage}%</span>
+                                            <span className="text-[10px] text-(--text-muted) uppercase">{label}</span>
+                                            <span className="text-[10px] text-(--text-muted)">{percentage}%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -330,7 +330,7 @@ export function GradeDistributionChart({ grades, className }: GradeDistributionP
                     </div>
                 </div>
             ) : (
-                <div className="text-center text-[var(--text-muted)] py-12">
+                <div className="text-center text-(--text-muted) py-12">
                     No grade data available
                 </div>
             )}
@@ -365,12 +365,12 @@ export function SemesterMarksChart({ data, className, onSelectSemester }: Semest
     };
 
     return (
-        <div className={cn('bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
+        <div className={cn('bg-(--card-bg) rounded-xl p-4 sm:p-6 border border-(--card-border) animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="h-3 sm:h-4 w-1 bg-pink-500 rounded-full" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">Marks Progression</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-(--text-secondary) uppercase tracking-widest">Marks Progression</h3>
                 {onSelectSemester && (
-                    <span className="text-[9px] sm:text-[10px] text-[var(--text-muted)] ml-auto hidden sm:block">Click bar to view</span>
+                    <span className="text-[9px] sm:text-[10px] text-(--text-muted) ml-auto hidden sm:block">Click bar to view</span>
                 )}
             </div>
 
@@ -421,10 +421,10 @@ export function SubjectRadarChart({ data, className }: SubjectRadarProps) {
     const chartColors = useChartColors();
 
     return (
-        <div className={cn('bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
+        <div className={cn('bg-(--card-bg) rounded-xl p-4 sm:p-6 border border-(--card-border) animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="h-3 sm:h-4 w-1 bg-rose-500 rounded-full" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">Subject Distribution</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-(--text-secondary) uppercase tracking-widest">Subject Distribution</h3>
             </div>
             <ResponsiveContainer width="100%" height={220}>
                 <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>

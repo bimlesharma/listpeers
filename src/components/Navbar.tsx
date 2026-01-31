@@ -47,7 +47,7 @@ export function Navbar() {
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{color: 'var(--primary)'}}>
                             <GraduationCap className="w-7 h-7" />
                         </div>
-                        <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-600">PeerList</span>
+                        <span className="text-lg font-bold text-transparent bg-clip-text bg-linear-to-r from-rose-500 to-pink-600">PeerList</span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -63,7 +63,7 @@ export function Navbar() {
                                         'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                                         isActive
                                             ? 'bg-[var(--primary)] bg-opacity-10 text-[var(--primary)]'
-                                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'
+                                            : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--hover-bg)'
                                     )}
                                 >
                                     <Icon className="w-4 h-4" />
@@ -78,7 +78,7 @@ export function Navbar() {
                         {/* Theme toggle */}
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors"
+                            className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--hover-bg) transition-colors"
                             aria-label="Toggle theme"
                         >
                             {theme === 'dark' ? (
@@ -91,7 +91,7 @@ export function Navbar() {
                         {/* Logout */}
                         <button
                             onClick={handleLogout}
-                            className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--error)] hover:bg-[var(--hover-bg)] transition-colors"
+                            className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-[var(--error)] hover:bg-(--hover-bg) transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             Logout
@@ -100,7 +100,7 @@ export function Navbar() {
                         {/* Mobile menu button */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="md:hidden p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]"
+                            className="md:hidden p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--hover-bg)"
                         >
                             {mobileMenuOpen ? (
                                 <X className="w-5 h-5" />
@@ -113,7 +113,7 @@ export function Navbar() {
 
                 {/* Mobile Navigation */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden py-4 border-t border-[var(--card-border)] animate-fade-in">
+                    <div className="md:hidden py-4 border-t border-(--card-border) animate-fade-in">
                         <div className="flex flex-col gap-1">
                             {navItems.map((item) => {
                                 const Icon = item.icon;
@@ -127,7 +127,7 @@ export function Navbar() {
                                             'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                                             isActive
                                                 ? 'bg-[var(--primary)] bg-opacity-10 text-[var(--primary)]'
-                                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'
+                                                : 'text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--hover-bg)'
                                         )}
                                     >
                                         <Icon className="w-5 h-5" />
@@ -137,7 +137,7 @@ export function Navbar() {
                             })}
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--error)] hover:bg-[var(--hover-bg)] transition-colors"
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-[var(--error)] hover:bg-(--hover-bg) transition-colors"
                             >
                                 <LogOut className="w-5 h-5" />
                                 Logout

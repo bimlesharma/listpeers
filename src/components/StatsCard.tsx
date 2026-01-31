@@ -29,10 +29,10 @@ export function StatsCard({
         <div className={cn('card p-6', className)}>
             <div className="flex items-start justify-between">
                 <div>
-                    <p className="text-sm text-[var(--text-secondary)] mb-1">{title}</p>
-                    <p className="text-3xl font-bold text-[var(--text-primary)]">{value}</p>
+                    <p className="text-sm text-(--text-secondary) mb-1">{title}</p>
+                    <p className="text-3xl font-bold text-(--text-primary)">{value}</p>
                     {subtitle && (
-                        <p className="text-sm text-[var(--text-muted)] mt-1">{subtitle}</p>
+                        <p className="text-sm text-(--text-muted) mt-1">{subtitle}</p>
                     )}
                 </div>
                 <div className={cn('p-3 rounded-xl bg-opacity-10', colorClasses[color])}>

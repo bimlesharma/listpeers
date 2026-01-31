@@ -23,16 +23,16 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
     if (active && payload && payload.length) {
         const subjectName = payload[0]?.payload?.subjectName;
         return (
-            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg p-3 shadow-xl">
+            <div className="bg-(--card-bg) border border-(--card-border) rounded-lg p-3 shadow-xl">
                 {subjectName && (
-                    <p className="text-[var(--text-primary)] font-bold text-sm mb-1">{subjectName}</p>
+                    <p className="text-(--text-primary) font-bold text-sm mb-1">{subjectName}</p>
                 )}
-                <p className="text-[var(--text-secondary)] text-xs mb-2">{label}</p>
+                <p className="text-(--text-secondary) text-xs mb-2">{label}</p>
                 {payload.map((entry, index) => (
                     <div key={index} className="flex items-center gap-2 text-xs">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                        <span className="text-[var(--text-secondary)]">{entry.name}:</span>
-                        <span className="text-[var(--text-primary)] font-bold">{entry.value}</span>
+                        <span className="text-(--text-secondary)">{entry.name}:</span>
+                        <span className="text-(--text-primary) font-bold">{entry.value}</span>
                     </div>
                 ))}
             </div>
@@ -53,10 +53,10 @@ export function SubjectMarksStackedBarChart({ data, className }: SubjectMarksSta
     };
 
     return (
-        <div className={cn('bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
+        <div className={cn('bg-(--card-bg) rounded-xl p-4 sm:p-6 border border-(--card-border) animate-fade-in-up card-hover group hover:border-rose-500/30 transition-all duration-300', className)}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="h-3 sm:h-4 w-1 bg-pink-500 rounded-full animate-glow-pulse" />
-                <h3 className="text-xs sm:text-sm font-bold text-[var(--text-secondary)] uppercase tracking-widest">Subject Performance</h3>
+                <h3 className="text-xs sm:text-sm font-bold text-(--text-secondary) uppercase tracking-widest">Subject Performance</h3>
             </div>
 
             <ResponsiveContainer width="100%" height={250}>

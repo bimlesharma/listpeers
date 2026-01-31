@@ -60,23 +60,23 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
     if (!student.marks_visibility) {
         return (
             <div className="max-w-2xl mx-auto px-4 py-8">
-                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-8 text-center animate-fade-in-up">
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-8 text-center animate-fade-in-up">
                     <div className="p-4 rounded-full bg-rose-500/10 w-fit mx-auto mb-4">
                         <Lock className="w-10 h-10 text-rose-500" />
                     </div>
-                    <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+                    <h1 className="text-2xl font-bold text-(--text-primary) mb-2">
                         Peers Access
                     </h1>
-                    <p className="text-[var(--text-secondary)] mb-6 max-w-md mx-auto">
+                    <p className="text-(--text-secondary) mb-6 max-w-md mx-auto">
                         To view your classmates' detailed academic results, you need to share your marks too.
                         This is a fair-trade model: you share to see, others share to be seen.
                     </p>
 
-                    <div className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] mb-6 text-left">
-                        <h3 className="font-medium text-[var(--text-primary)] mb-2">
+                    <div className="p-4 rounded-lg bg-secondary border border-(--card-border) mb-6 text-left">
+                        <h3 className="font-medium text-(--text-primary) mb-2">
                             What happens when you opt in:
                         </h3>
-                        <ul className="text-sm text-[var(--text-secondary)] space-y-2">
+                        <ul className="text-sm text-(--text-secondary) space-y-2">
                             <li className="flex items-start gap-2">
                                 <span className="text-emerald-500">✓</span>
                                 Your detailed marks become visible to other opted-in students
@@ -99,7 +99,7 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                     <button
                         onClick={handleOptIn}
                         disabled={loading}
-                        className="px-6 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 mx-auto disabled:opacity-50 shadow-lg shadow-rose-500/20 transition-all"
+                        className="px-6 py-3 bg-linear-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 mx-auto disabled:opacity-50 shadow-lg shadow-rose-500/20 transition-all"
                     >
                         {loading ? (
                             <>
@@ -114,7 +114,7 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                         )}
                     </button>
 
-                    <p className="text-xs text-[var(--text-muted)] mt-4">
+                    <p className="text-xs text-(--text-muted) mt-4">
                         By opting in, you agree to share your detailed academic marks with other opted-in students.
                     </p>
                 </div>
@@ -126,27 +126,27 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
         <div className="max-w-4xl mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-6 animate-fade-in-up">
                 <div>
-                    <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+                    <h1 className="text-2xl font-bold text-(--text-primary)">
                         Peers
                     </h1>
-                    <p className="text-[var(--text-secondary)] mt-1">
+                    <p className="text-(--text-secondary) mt-1">
                         {filteredPeers.length} classmate{filteredPeers.length !== 1 ? 's' : ''} sharing marks
                     </p>
                 </div>
-                <Link href="/settings" className="text-sm text-[var(--text-muted)] hover:text-rose-500 transition-colors">
+                <Link href="/settings" className="text-sm text-(--text-muted) hover:text-rose-500 transition-colors">
                     Manage sharing →
                 </Link>
             </div>
 
             {/* Search */}
             <div className="relative mb-6 animate-fade-in-up stagger-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--text-muted)" />
                 <input
                     type="text"
                     placeholder="Search by name, enrollment, branch..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-rose-500 focus:outline-none transition-colors"
+                    className="w-full pl-12 pr-4 py-3 bg-(--card-bg) border border-(--card-border) rounded-xl text-(--text-primary) placeholder-(--text-muted) focus:border-rose-500 focus:outline-none transition-colors"
                 />
             </div>
 
@@ -164,7 +164,7 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                             <Link
                                 key={peer.id}
                                 href={`/peers/${peer.id}`}
-                                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 hover:border-rose-500/50 transition-all group"
+                                className="bg-(--card-bg) border border-(--card-border) rounded-xl p-4 hover:border-rose-500/50 transition-all group"
                             >
                                 <div className="flex items-start gap-3">
                                     {/* Avatar */}
@@ -191,18 +191,18 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                                     {/* Info */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-semibold text-[var(--text-primary)] truncate group-hover:text-rose-500 transition-colors">
+                                            <h3 className="font-semibold text-(--text-primary) truncate group-hover:text-rose-500 transition-colors">
                                                 {maskedIdentity.displayName}
                                             </h3>
                                             {peer.display_mode !== 'visible' && (
-                                                <div title={`Privacy mode: ${peer.display_mode}`} className="flex-shrink-0">
-                                                    <Lock className="w-3 h-3 text-[var(--text-muted)] opacity-70" />
+                                                <div title={`Privacy mode: ${peer.display_mode}`} className="shrink-0">
+                                                    <Lock className="w-3 h-3 text-(--text-muted) opacity-70" />
                                                 </div>
                                             )}
-                                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <ExternalLink className="w-3 h-3 text-(--text-muted) opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                         {peer.branch && (
-                                            <p className="text-xs text-[var(--text-secondary)] mt-1 truncate">
+                                            <p className="text-xs text-(--text-secondary) mt-1 truncate">
                                                 {peer.branch}
                                             </p>
                                         )}
@@ -218,14 +218,14 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
                     })}
                 </div>
             ) : (
-                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-12 text-center animate-fade-in-up stagger-2">
-                    <div className="p-4 rounded-full bg-[var(--secondary)] w-fit mx-auto mb-4">
-                        <Users className="w-10 h-10 text-[var(--text-muted)]" />
+                <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-12 text-center animate-fade-in-up stagger-2">
+                    <div className="p-4 rounded-full bg-secondary w-fit mx-auto mb-4">
+                        <Users className="w-10 h-10 text-(--text-muted)" />
                     </div>
-                    <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+                    <h2 className="text-xl font-semibold text-(--text-primary) mb-2">
                         {searchQuery ? 'No Matches Found' : 'No Peers Yet'}
                     </h2>
-                    <p className="text-[var(--text-secondary)] max-w-md mx-auto">
+                    <p className="text-(--text-secondary) max-w-md mx-auto">
                         {searchQuery
                             ? 'Try adjusting your search query.'
                             : 'Be the first to share! Invite your classmates to join and share their marks.'
@@ -235,7 +235,7 @@ export function PeersClient({ student, peersData }: PeersClientProps) {
             )}
 
             {/* Info */}
-            <p className="text-xs text-center text-[var(--text-muted)] mt-6">
+            <p className="text-xs text-center text-(--text-muted) mt-6">
                 Only students who have opted to share their marks are visible here.
             </p>
         </div>

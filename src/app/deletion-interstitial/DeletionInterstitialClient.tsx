@@ -81,7 +81,7 @@ export default function DeletionInterstitialClient({ deletionRecords }: Props) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-20 -left-32 h-64 w-64 rounded-full bg-rose-500/10 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-pink-500/10 blur-3xl" />
@@ -221,7 +221,7 @@ export default function DeletionInterstitialClient({ deletionRecords }: Props) {
                 <button
                   onClick={handleRegisterNew}
                   disabled={!acknowledged || acknowledging}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-rose-600 hover:to-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-linear-to-r from-rose-500 to-pink-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-rose-600 hover:to-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {acknowledging ? 'Processing…' : 'Register as New User'}
                 </button>
