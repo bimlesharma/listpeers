@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function LandingPage() {
     const supabase = createClient();
@@ -114,22 +115,6 @@ export default function LandingPage() {
         <div className="min-h-screen bg-[var(--bg)]">
             <PublicNavbar />
 
-            {/* CTA Button (Sign In) */}
-            <div className="max-w-7xl mx-auto px-4 py-4 flex justify-end">
-                <button
-                    onClick={handleGitHubSignIn}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-medium rounded-lg transition-all disabled:opacity-50"
-                >
-                    {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Github className="w-4 h-4" />
-                    )}
-                    Sign In
-                </button>
-            </div>
-
             {/* Hero Section */}
             <section className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
                 <div className="text-center mb-12">
@@ -148,20 +133,19 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
                     {features.map((feature, i) => (
                         <div key={i} className="p-4 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] hover:border-rose-500/30 transition-all">
-                            <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
-                                    <feature.icon className="w-5 h-5 text-rose-500" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-[var(--text-primary)]">{feature.title}</h3>
-                                    <p className="text-[var(--text-muted)] text-sm mt-1">{feature.description}</p>
+                                <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center flex-shrink-0">
+                                        <feature.icon className="w-5 h-5 text-rose-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-[var(--text-primary)]">{feature.title}</h3>
+                                        <p className="text-[var(--text-muted)] text-sm mt-1">{feature.description}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </section>
-
 
             {/* Account Control Section */}
             <section className="bg-[var(--secondary)] border-y border-[var(--card-border)] py-16">
@@ -240,7 +224,7 @@ export default function LandingPage() {
             {/* Open Source & Compliance Section */}
             <section className="bg-gradient-to-r from-rose-500/10 to-pink-600/10 border-y border-rose-500/20 py-16">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                         <div>
                             <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <Code className="w-6 h-6 text-rose-500" />
@@ -268,49 +252,29 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
-                            <h3 className="font-bold text-[var(--text-primary)] mb-3">Compliance</h3>
-                            <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                                <li>✓ GDPR Compliant</li>
-                                <li>✓ Aligned with Indian data protection frameworks</li>
-                                <li>✓ Data Protection Act aligned</li>
-                                <li>✓ No unauthorized data retention</li>
-                                <li>✓ Transparent privacy policies</li>
-                            </ul>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                        <h3 className="font-bold text-[var(--text-primary)] mb-3">Compliance</h3>
+                        <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                            <li>✓ GDPR Compliant</li>
+                            <li>✓ Aligned with Indian data protection frameworks</li>
+                            <li>✓ Data Protection Act aligned</li>
+                            <li>✓ No unauthorized data retention</li>
+                            <li>✓ Transparent privacy policies</li>
+                        </ul>
+                    </div>
 
-                        <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
-                            <h3 className="font-bold text-[var(--text-primary)] mb-3">Technology & Security</h3>
-                            <ul className="space-y-2 text-[var(--text-muted)] text-sm">
-                                <li>✓ End-to-end encrypted connections (TLS)</li>
-                                <li>✓ Row-Level Security (RLS) in database</li>
-                                <li>✓ Server-side validation</li>
-                                <li>✓ Immutable audit logs</li>
-                                <li>✓ Regular security updates</li>
-                            </ul>
-                        </div>
+                    <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)]">
+                        <h3 className="font-bold text-[var(--text-primary)] mb-3">Technology & Security</h3>
+                        <ul className="space-y-2 text-[var(--text-muted)] text-sm">
+                            <li>✓ End-to-end encrypted connections (TLS)</li>
+                            <li>✓ Row-Level Security (RLS) in database</li>
+                            <li>✓ Server-side validation</li>
+                            <li>✓ Immutable audit logs</li>
+                            <li>✓ Regular security updates</li>
+                        </ul>
                     </div>
                 </div>
-            </section>
-
-            {/* Privacy Policy & Terms Link */}
-            <section className="max-w-7xl mx-auto px-4 py-12">
-                <div className="p-6 rounded-lg bg-[var(--secondary)] border border-[var(--card-border)] text-center">
-                    <p className="text-[var(--text-muted)] mb-4">
-                        For detailed information about how we collect, use, and protect your data, please review our full policies:
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Link href="/privacy-policy" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Privacy Policy</Link>
-                        <span className="text-[var(--card-border)]">•</span>
-                        <Link href="/terms-of-service" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Terms of Service</Link>
-                        <span className="text-[var(--card-border)]">•</span>
-                        <Link href="/data-protection" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Data Protection</Link>
-                        <span className="text-[var(--card-border)]">•</span>
-                        <Link href="/platform-architecture" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Platform Architecture</Link>
-                        <span className="text-[var(--card-border)]">•</span>
-                        <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:text-rose-600 font-medium text-sm">Source Code</a>
-                    </div>
                 </div>
             </section>
 
@@ -333,39 +297,8 @@ export default function LandingPage() {
                     </button>
                 </div>
             </section>
-
-            {/* Footer */}
-            <footer className="border-t border-[var(--card-border)] bg-[var(--card-bg)] py-8">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-                            <GraduationCap className="w-3 h-3 text-white" />
-                        </div>
-                        <span className="font-bold text-[var(--text-primary)]">PeerList</span>
-                    </div>
-                    <p className="text-[var(--text-muted)] text-sm mb-2">
-                        Made with <Heart className="w-4 h-4 inline text-rose-500" /> by GGSIPU students for GGSIPU students
-                    </p>
-                    <p className="text-[var(--text-muted)] text-xs mb-3">
-                        Not affiliated with Guru Gobind Singh Indraprastha University • Open Source Initiative
-                    </p>
-                    <div className="flex items-center justify-center gap-2 text-xs mb-3 flex-wrap">
-                        <Link href="/privacy-policy" className="text-rose-500 hover:text-rose-600 transition-colors">Privacy Policy</Link>
-                        <span className="text-[var(--text-muted)]">•</span>
-                        <Link href="/terms-of-service" className="text-rose-500 hover:text-rose-600 transition-colors">Terms of Service</Link>
-                        <span className="text-[var(--text-muted)]">•</span>
-                        <Link href="/data-protection" className="text-rose-500 hover:text-rose-600 transition-colors">Data Protection</Link>
-                        <span className="text-[var(--text-muted)]">•</span>
-                        <Link href="/platform-architecture" className="text-rose-500 hover:text-rose-600 transition-colors">Platform Architecture</Link>
-                        <span className="text-[var(--text-muted)]">•</span>
-                        <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:text-rose-600 transition-colors">Source Code</a>
-                    </div>
-                    <p className="text-[var(--text-muted)] text-xs">
-                        © 2026 PeerList. All rights reserved. | 
-                        <a href="https://github.com/bimlesh1/peerlist" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:text-rose-600 ml-1">GitHub</a>
-                    </p>
-                </div>
-            </footer>
+            
+            <PublicFooter />
         </div>
     );
 }

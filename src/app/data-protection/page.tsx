@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ShieldCheck, Lock, Server, Database } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function DataProtectionPage() {
     return (
@@ -64,6 +65,7 @@ export default function DataProtectionPage() {
                 </div>
             </section>
         </main>
+            <PublicFooter />
         </>
     );
 }

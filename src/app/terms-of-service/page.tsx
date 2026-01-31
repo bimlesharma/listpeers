@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { FileText, AlertTriangle, Shield } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function TermsOfServicePage() {
     return (
@@ -82,6 +83,7 @@ export default function TermsOfServicePage() {
                 </div>
             </section>
         </main>
+            <PublicFooter />
         </>
     );
 }

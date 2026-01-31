@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Shield, Lock, Eye, FileText } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function PrivacyPolicyPage() {
     return (
@@ -84,6 +85,7 @@ export default function PrivacyPolicyPage() {
                 </div>
             </section>
         </main>
+            <PublicFooter />
         </>
     );
 }

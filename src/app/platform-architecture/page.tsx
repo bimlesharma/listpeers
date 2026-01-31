@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Code, ArrowDown, ArrowUp, ArrowLeftRight, Globe, Settings, Lock, Database, GraduationCap } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function PlatformArchitecturePage() {
     return (
@@ -182,6 +183,7 @@ export default function PlatformArchitecturePage() {
                 </div>
             </section>
         </main>
+            <PublicFooter />
         </>
     );
 }
