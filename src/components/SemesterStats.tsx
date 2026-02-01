@@ -74,9 +74,10 @@ interface OverallStatsProps {
     totalSubjects: number;
     totalSemesters: number;
     semesterNumbers?: number[];
+    backlogs?: number;
 }
 
-export function OverallStats({ totalObtained, totalMax, cgpa, totalCredits, totalSubjects, totalSemesters, semesterNumbers }: OverallStatsProps) {
+export function OverallStats({ totalObtained, totalMax, cgpa, totalCredits, totalSubjects, totalSemesters, semesterNumbers, backlogs = 0 }: OverallStatsProps) {
     const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
 
     // Calculate total credits from data file if semester numbers provided
@@ -92,7 +93,7 @@ export function OverallStats({ totalObtained, totalMax, cgpa, totalCredits, tota
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
             {/* Marks - Combined Obtained/Maximum */}
             <div className="animate-fade-in-up stagger-1 bg-(--card-bg) border border-(--card-border) rounded-xl p-3 sm:p-4 md:p-5 relative overflow-hidden group transition-all duration-300 card-hover hover:border-rose-500/50">
                 <div className="absolute inset-0 bg-linear-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -143,6 +144,16 @@ export function OverallStats({ totalObtained, totalMax, cgpa, totalCredits, tota
                     <h3 className="text-[9px] sm:text-[10px] font-bold text-(--text-muted) uppercase tracking-widest mb-1 sm:mb-2">Subjects</h3>
                     <div className="text-lg sm:text-xl md:text-2xl font-black text-(--text-primary) animate-count-up">{totalSubjects}</div>
                     <p className="text-[9px] sm:text-[10px] text-(--text-muted) mt-0.5 sm:mt-1">{totalSemesters} Semesters</p>
+                </div>
+            </div>
+
+            {/* Backlogs */}
+            <div className="animate-fade-in-up stagger-6 bg-(--card-bg) border border-(--card-border) rounded-xl p-3 sm:p-4 md:p-5 relative overflow-hidden group transition-all duration-300 card-hover hover:border-emerald-500/50">
+                <div className={`absolute inset-0 bg-linear-to-br ${backlogs === 0 ? 'from-emerald-500/5' : 'from-red-500/5'} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <div className="relative z-10">
+                    <h3 className="text-[9px] sm:text-[10px] font-bold text-(--text-muted) uppercase tracking-widest mb-1 sm:mb-2">Backlogs</h3>
+                    <div className={`text-lg sm:text-xl md:text-2xl font-black animate-count-up ${backlogs === 0 ? 'text-emerald-500' : 'text-red-500'}`}>{backlogs}</div>
+                    <p className="text-[9px] sm:text-[10px] text-(--text-muted) mt-0.5 sm:mt-1">{backlogs === 0 ? 'Clear Record' : 'Failed Subjects'}</p>
                 </div>
             </div>
         </div>

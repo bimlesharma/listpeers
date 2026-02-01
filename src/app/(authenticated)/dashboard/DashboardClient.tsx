@@ -59,6 +59,12 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
     const cgpa = calculateCGPA(processed.map(p => ({ sgpa: p.sgpa, totalCredits: p.totalCredits })));
     const gradeDistribution = getGradeDistribution(allSubjects);
     const totalCredits = processed.reduce((sum, p) => sum + p.totalCredits, 0);
+    
+    // Calculate backlogs (failed subjects - grade 'F' or total_marks < 40)
+    const backlogs = allSubjects.filter(subject => {
+        const grade = subject.grade || marksToGrade(subject.total_marks);
+        return grade === 'F' || subject.total_marks < 40;
+    }).length;
 
     // Student info from profile
     const studentName = student.name || 'Student';
@@ -170,6 +176,7 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
                                         totalSubjects={allSubjects.length}
                                         totalSemesters={processed.length}
                                         semesterNumbers={processed.map(p => p.semesterNumber)}
+                                        backlogs={backlogs}
                                     />
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                         <SGPATrendChart
