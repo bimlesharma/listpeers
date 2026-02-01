@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield, Lock, Eye, FileText } from 'lucide-react';
+import { Shield, Lock, Eye, FileText, AlertTriangle } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
 import { PublicFooter } from '@/components/PublicFooter';
 
@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
                         </h2>
                         <ul className="text-(--text-muted) text-sm space-y-2">
                             <li>• Account identity from GitHub OAuth (name, email, avatar as provided).</li>
-                            <li>• Academic results you authorize us to import from GGSIPU systems.</li>
+                            <li>• Academic results you authorize us to import from GGSIPU systems. This import is initiated explicitly by you and occurs one-time only. We act as a facilitator to help you access and analyze your own data.</li>
                             <li>• Consent preferences (analytics, rankboard, peers, identity visibility).</li>
                         </ul>
                     </section>
@@ -61,8 +61,17 @@ export default function PrivacyPolicyPage() {
                     <section className="p-6 rounded-lg border border-(--card-border) bg-secondary">
                         <h2 className="font-semibold text-lg mb-2">Retention & Deletion</h2>
                         <p className="text-(--text-muted) text-sm">
-                            You can delete your account at any time. This permanently removes your data from our database. Consent
-                            logs are retained as an immutable record of your choices.
+                            You can delete your account at any time. This permanently removes all your personal data and academic records from our database. Consent and deletion logs are retained solely for compliance and audit purposes, and do not include any personal or academic information. If you delete your account and later return, your previous academic data is not restored; a new, explicit user-triggered import is required.
+                        </p>
+                    </section>
+
+                    <section className="p-6 rounded-lg border border-(--card-border) bg-secondary">
+                        <h2 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                            <AlertTriangle className="w-5 h-5 text-rose-500" />
+                            Important: Source of Truth
+                        </h2>
+                        <p className="text-(--text-muted) text-sm">
+                            <strong>ListPeers is not an authoritative source of academic records.</strong> The official university portal remains the sole source of truth for your academic standing. Always verify important results or decisions with your institution's official systems.
                         </p>
                     </section>
 

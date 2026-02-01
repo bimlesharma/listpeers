@@ -34,9 +34,12 @@ export default function TermsOfServicePage() {
                             Acceptable Use
                         </h2>
                         <ul className="text-(--text-muted) text-sm space-y-2">
-                            <li>• Do not misuse or overload university systems.</li>
+                            <li>• Do not misuse or overload university systems or ListPeers infrastructure.</li>
                             <li>• Do not attempt to access data that is not yours.</li>
                             <li>• Do not bypass consent or privacy controls.</li>
+                            <li>• Do not use automated scripts, crawlers, or repeated bulk retrieval methods.</li>
+                            <li>• Do not perform background polling or attempt to circumvent one-time import restrictions.</li>
+                            <li>• Data must be fetched only at your explicit request, one-time per import cycle.</li>
                         </ul>
                     </section>
 
@@ -47,7 +50,7 @@ export default function TermsOfServicePage() {
                         </h2>
                         <p className="text-(--text-muted) text-sm">
                             ListPeers is provided “as-is” without warranties. We do not guarantee data accuracy, availability, or
-                            uninterrupted service. For official results, always rely on GGSIPU’s official portals.
+                            uninterrupted service. <strong>ListPeers is not an authoritative source of academic records.</strong> For official results and academic standing, always rely on your university's official portals. Do not make academic or institutional decisions based solely on ListPeers data.
                         </p>
                     </section>
 

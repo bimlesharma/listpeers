@@ -334,7 +334,7 @@ ListPeers implements several lazy loading and performance optimizations to enhan
 No. ListPeers is an independent, student-run platform.
 
 **Q: Do you fetch marks automatically?**
-No. All data is manually submitted by students.
+No. Data is fetched only when you explicitly request an import. The import occurs one-time and is initiated entirely by you. We act as a facilitator to help you access and analyze your own data from official university systems.
 
 **Q: Who can see my identity?**
 Only peers if you allow it via `display_mode` and opt into sharing.
@@ -342,6 +342,12 @@ Only peers if you allow it via `display_mode` and opt into sharing.
 **Q: What happens when I disable analytics consent?**
 Only raw marks tables are shown; all charts and aggregates are hidden.
 
+**Q: What happens if I delete my account and come back later?**
+Your account and all associated data are permanently deleted. If you return later, you will need to authorize a fresh import of your academic data. Previous data is not automatically restored.
+
+**Q: Is ListPeers an official or authoritative source of my academic records?**
+No. ListPeers is an independent student analytics tool. The official university portal is the authoritative source for your academic standing. Always verify important results or decisions with your institution's official systems.
+
 ## Disclaimer
 
-ListPeers is not affiliated with or endorsed by any university. All data is voluntarily submitted by students. Rankboards are generated solely from self-submitted data and do not represent official academic rankings.
+ListPeers is not affiliated with or endorsed by any university. All data is fetched at the explicit request of the student and represents a one-time import from official systems. Rankboards are generated solely from student-submitted data and do not represent official academic rankings or institutional standing. ListPeers is provided as-is for personal analytics purposes only and is not a substitute for official university records.
