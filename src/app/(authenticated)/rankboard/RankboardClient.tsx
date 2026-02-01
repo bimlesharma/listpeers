@@ -180,60 +180,62 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
 
             {/* Filters */}
             <div className="bg-(--card-bg) border border-(--card-border) rounded-xl p-4 mb-6 animate-fade-in-up stagger-1">
-                <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-2 shrink-0">
                         <Filter className="w-4 h-4 text-rose-500" />
                         <span className="text-sm font-medium text-(--text-primary)">Filters:</span>
                     </div>
 
-                    {batches.length > 0 && (
-                        <select
-                            value={batchFilter}
-                            onChange={(e) => setBatchFilter(e.target.value)}
-                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
-                        >
-                            <option value="all">All Batches</option>
-                            {batches.map(b => (
-                                <option key={b} value={b}>{b}</option>
-                            ))}
-                        </select>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2 flex-1">
+                        {batches.length > 0 && (
+                            <select
+                                value={batchFilter}
+                                onChange={(e) => setBatchFilter(e.target.value)}
+                                className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors max-w-[140px] truncate"
+                            >
+                                <option value="all">All Batches</option>
+                                {batches.map(b => (
+                                    <option key={b} value={b}>{b}</option>
+                                ))}
+                            </select>
+                        )}
 
-                    {branches.length > 0 && (
-                        <select
-                            value={branchFilter}
-                            onChange={(e) => setBranchFilter(e.target.value)}
-                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
-                        >
-                            <option value="all">All Branches</option>
-                            {branches.map(b => (
-                                <option key={b} value={b}>{b}</option>
-                            ))}
-                        </select>
-                    )}
+                        {branches.length > 0 && (
+                            <select
+                                value={branchFilter}
+                                onChange={(e) => setBranchFilter(e.target.value)}
+                                className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors flex-1 min-w-[200px] max-w-full sm:max-w-[300px] truncate"
+                            >
+                                <option value="all">All Branches</option>
+                                {branches.map(b => (
+                                    <option key={b} value={b}>{b}</option>
+                                ))}
+                            </select>
+                        )}
 
-                    {colleges.length > 0 && (
-                        <select
-                            value={collegeFilter}
-                            onChange={(e) => setCollegeFilter(e.target.value)}
-                            className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors"
-                        >
-                            <option value="all">All Colleges</option>
-                            {colleges.map(c => (
-                                <option key={c} value={c}>{c}</option>
-                            ))}
-                        </select>
-                    )}
+                        {colleges.length > 0 && (
+                            <select
+                                value={collegeFilter}
+                                onChange={(e) => setCollegeFilter(e.target.value)}
+                                className="bg-(--input-bg) border border-(--card-border) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) focus:border-rose-500 focus:outline-none transition-colors flex-1 min-w-[200px] max-w-full sm:max-w-[300px] truncate"
+                            >
+                                <option value="all">All Colleges</option>
+                                {colleges.map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        )}
 
-                    {hasActiveFilters && (
-                        <button
-                            onClick={clearAllFilters}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-                        >
-                            <X className="w-3 h-3" />
-                            Clear filters
-                        </button>
-                    )}
+                        {hasActiveFilters && (
+                            <button
+                                onClick={clearAllFilters}
+                                className="flex items-center gap-1 px-3 py-1.5 text-sm text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors shrink-0"
+                            >
+                                <X className="w-3 h-3" />
+                                Clear filters
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
