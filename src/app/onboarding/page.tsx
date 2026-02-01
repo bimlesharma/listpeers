@@ -76,6 +76,40 @@ export default function OnboardingPage() {
         return `${maskedLocal}@${domain}`;
     };
 
+    const fetchLinkedEmail = useCallback(
+        async (enrollment: string, college: string | null) => {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            if (!token) {
+                return null;
+            }
+
+            try {
+                const res = await fetch('/api/auth/linked-enrollment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        enrollmentNo: enrollment,
+                        college,
+                    }),
+                });
+
+                if (!res.ok) {
+                    return null;
+                }
+
+                const data = await res.json();
+                return typeof data?.maskedEmail === 'string' ? data.maskedEmail : null;
+            } catch {
+                return null;
+            }
+        },
+        [supabase]
+    );
+
     // Check if user already has a profile
     useEffect(() => {
         const checkExistingProfile = async () => {
@@ -268,7 +302,10 @@ export default function OnboardingPage() {
             existingByEnrollment = (enrollmentLookupResponse.data ?? null) as EnrollmentLookup | null;
 
             if (existingByEnrollment) {
-                const linkedEmail = maskEmail(existingByEnrollment.email);
+                const linkedEmail =
+                    maskEmail(existingByEnrollment.email) ||
+                    (await fetchLinkedEmail(enrollmentNo.trim().toUpperCase(), studentInstitute?.trim() ?? null)) ||
+                    'the existing account';
                 setError(
                     `This enrollment number is already registered with another GitHub account (${linkedEmail}). To use ListPeers with a different GitHub account, please delete your existing account first from Settings, then return here to re-register.`
                 );
@@ -331,12 +368,9 @@ export default function OnboardingPage() {
                         errorDetails.includes('enrollment_no') ||
                         errorHint.includes('enrollment_no')
                     ) {
-                        const { data: enrollmentRecord } = (await supabase
-                            .from('students')
-                            .select('email')
-                            .eq('enrollment_no', enrollmentNo.trim().toUpperCase())
-                            .maybeSingle()) as { data: { email: string | null } | null };
-                        const linkedEmail = maskEmail(enrollmentRecord?.email ?? null);
+                        const linkedEmail =
+                            (await fetchLinkedEmail(enrollmentNo.trim().toUpperCase(), studentInstitute?.trim() ?? null)) ||
+                            'the existing account';
                         setError(
                             `This enrollment number is already registered with another GitHub account (${linkedEmail}) for this college. To use ListPeers with a different GitHub account, please delete your existing account first from Settings, then return here to re-register.`
                         );
