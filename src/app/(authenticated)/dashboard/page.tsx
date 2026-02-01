@@ -14,8 +14,7 @@ const DashboardClient = dynamic(() => import('./DashboardClient').then(mod => ({
             <ChartSkeleton />
             <TableSkeleton />
         </div>
-    ),
-    ssr: false
+    )
 });
 
 interface RecordWithSubjects extends AcademicRecord {

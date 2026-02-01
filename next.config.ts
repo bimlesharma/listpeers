@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['recharts', 'lucide-react'],
   },
-  
-  // Enable SWC minification for faster builds
-  swcMinify: true,
 };
 
 export default nextConfig;

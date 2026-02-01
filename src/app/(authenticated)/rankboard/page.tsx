@@ -12,8 +12,7 @@ const RankboardClient = dynamic(() => import('./RankboardClient').then(mod => ({
             <ChartSkeleton />
             <TableSkeleton />
         </div>
-    ),
-    ssr: false
+    )
 });
 
 export default async function RankboardPage() {

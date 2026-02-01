@@ -10,8 +10,7 @@ const PeersClient = dynamic(() => import('./PeersClient').then(mod => ({ default
             <HeaderSkeleton />
             <GridSkeleton count={9} />
         </div>
-    ),
-    ssr: false
+    )
 });
 
 export default async function PeersPage() {

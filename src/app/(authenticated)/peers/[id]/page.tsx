@@ -13,8 +13,7 @@ const PeerDashboardClient = dynamic(() => import('./PeerDashboardClient').then(m
             <ChartSkeleton />
             <TableSkeleton />
         </div>
-    ),
-    ssr: false
+    )
 });
 
 interface RecordWithSubjects {

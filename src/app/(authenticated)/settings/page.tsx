@@ -14,8 +14,7 @@ const SettingsClient = dynamic(() => import('./SettingsClient').then(mod => ({ d
                 ))}
             </div>
         </div>
-    ),
-    ssr: false
+    )
 });
 
 interface RecordWithSubjects extends AcademicRecord {
