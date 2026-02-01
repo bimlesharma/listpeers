@@ -361,10 +361,15 @@ export default function OnboardingPage() {
                         }
                     }
 
-                    // Clamp internal/external to database constraints (max_internal: 40, max_external: 60)
-                    const clampedInternal = Math.min(Math.max(internalMarks, 0), 40);
-                    const clampedExternal = Math.min(Math.max(externalMarks, 0), 60);
+                    // Use actual mark totals as max values (no hardcoded constraints)
+                    // This allows flexible schemes where subjects may have different mark distributions
+                    const clampedInternal = Math.max(internalMarks, 0);
+                    const clampedExternal = Math.max(externalMarks, 0);
                     const clampedCredits = Math.min(Math.max(credits, 1), 10);
+                    
+                    // Calculate actual maximums from the data
+                    const maxInternal = clampedInternal > 0 ? clampedInternal : 40; // fallback only
+                    const maxExternal = clampedExternal > 0 ? clampedExternal : 60; // fallback only
 
                     return {
                         record_id: record.id,
@@ -372,8 +377,8 @@ export default function OnboardingPage() {
                         name: result.papername.trim(),
                         internal_marks: clampedInternal,
                         external_marks: clampedExternal,
-                        max_internal: 40,
-                        max_external: 60,
+                        max_internal: maxInternal,
+                        max_external: maxExternal,
                         credits: clampedCredits,
                         grade: marksToGrade(totalMarks),
                         grade_point: marksToGradePoint(totalMarks),

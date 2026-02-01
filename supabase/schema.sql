@@ -69,8 +69,8 @@ CREATE TABLE public.subjects (
   external_marks INTEGER DEFAULT 0 CHECK (external_marks >= 0),
 
   -- Scheme Configuration
-  max_internal INTEGER DEFAULT 40 CHECK (max_internal > 0),
-  max_external INTEGER DEFAULT 60 CHECK (max_external > 0),
+  max_internal INTEGER CHECK (max_internal > 0),
+  max_external INTEGER CHECK (max_external > 0),
 
   -- Computed Total
   total_marks INTEGER GENERATED ALWAYS AS (
