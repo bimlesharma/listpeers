@@ -34,6 +34,21 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
+    // Pass user info to downstream Server Components via request headers
+    // This eliminates the need for pages to call getUser() again
+    if (user) {
+        request.headers.set('x-user-id', user.id);
+        if (user.email) {
+            request.headers.set('x-user-email', user.email);
+        }
+        // Re-create response with updated request headers, preserving existing cookies
+        const previousCookies = supabaseResponse.cookies.getAll();
+        supabaseResponse = NextResponse.next({ request });
+        previousCookies.forEach(cookie =>
+            supabaseResponse.cookies.set(cookie.name, cookie.value)
+        );
+    }
+
     // Protected routes
     const protectedPaths = ['/dashboard', '/records', '/rankboard', '/settings'];
     const isProtectedPath = protectedPaths.some(path =>

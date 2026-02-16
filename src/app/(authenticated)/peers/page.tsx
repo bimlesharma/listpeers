@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser, getStudentProfile, createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
@@ -14,20 +14,14 @@ const PeersClient = dynamic(() => import('./PeersClient').then(mod => ({ default
 });
 
 export default async function PeersPage() {
-    const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect('/');
     }
 
-    // Get current user's profile
-    const { data: student } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Get current user's profile (cached)
+    const { data: student } = await getStudentProfile(user.id);
 
     if (!student) {
         redirect('/onboarding');
@@ -47,6 +41,7 @@ export default async function PeersPage() {
     }[] = [];
 
     if (student.marks_visibility) {
+        const supabase = await createClient();
         const { data: peers } = await supabase.rpc('get_peers_directory');
         if (peers) {
             peersData = peers;

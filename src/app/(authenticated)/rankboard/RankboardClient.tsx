@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis
 const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
 const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
 const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
+
 
 interface RankboardEntry {
     student_id: string;
@@ -40,6 +40,27 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
     const [loading, setLoading] = useState(false);
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === 'dark';
+
+    // Manual chart sizing to avoid ResponsiveContainer -1 width/height warning
+    const chartContainerRef = useRef<HTMLDivElement>(null);
+    const [chartSize, setChartSize] = useState<{ width: number; height: number } | null>(null);
+
+    useEffect(() => {
+        const el = chartContainerRef.current;
+        if (!el) return;
+
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry) {
+                const { width } = entry.contentRect;
+                if (width > 0) {
+                    setChartSize({ width: Math.floor(width), height: 260 });
+                }
+            }
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     // Set default filters to user's own batch, branch, and college
     const [batchFilter, setBatchFilter] = useState<string>(student.batch || 'all');
@@ -251,9 +272,9 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                     <p className="text-sm text-(--text-secondary) mb-6">
                         CGPA by rank across {filteredData.length} participant{filteredData.length !== 1 ? 's' : ''}
                     </p>
-                    <div className="w-full h-64 min-h-[260px] min-w-0">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={260} minWidth={0}>
-                            <LineChart data={cgpaTrendData}>
+                    <div ref={chartContainerRef} className="w-full min-w-0" style={{ minHeight: 260 }}>
+                        {chartSize ? (
+                            <LineChart data={cgpaTrendData} width={chartSize.width} height={chartSize.height}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#27272a' : '#d6d3d1'} />
                                 <XAxis
                                     dataKey="rank"
@@ -290,7 +311,9 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                     activeDot={{ r: 5 }}
                                 />
                             </LineChart>
-                        </ResponsiveContainer>
+                        ) : (
+                            <ChartSkeleton />
+                        )}
                     </div>
                 </div>
             )}
@@ -320,22 +343,20 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                             className={`transition-colors ${isCurrentUser
                                                 ? 'bg-rose-500/10 hover:bg-rose-500/15'
                                                 : 'hover:bg-(--hover-bg)'
-                                            }`}
+                                                }`}
                                         >
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-2">
                                                     {rank <= 3 ? (
-                                                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                                                            rank === 1 ? 'bg-yellow-500/20' :
+                                                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${rank === 1 ? 'bg-yellow-500/20' :
                                                             rank === 2 ? 'bg-gray-400/20' :
-                                                            'bg-amber-600/20'
-                                                        }`}>
+                                                                'bg-amber-600/20'
+                                                            }`}>
                                                             <Trophy
-                                                                className={`w-4 h-4 ${
-                                                                    rank === 1 ? 'text-yellow-500' :
+                                                                className={`w-4 h-4 ${rank === 1 ? 'text-yellow-500' :
                                                                     rank === 2 ? 'text-gray-400' :
-                                                                    'text-amber-600'
-                                                                }`}
+                                                                        'text-amber-600'
+                                                                    }`}
                                                             />
                                                         </div>
                                                     ) : (
@@ -364,12 +385,11 @@ export function RankboardClient({ student, rankboardData, currentUserId }: Rankb
                                                 {entry.branch || '-'}
                                             </td>
                                             <td className="px-4 py-4 text-right">
-                                                <span className={`text-lg font-bold ${
-                                                    entry.cgpa >= 9 ? 'text-yellow-500' :
+                                                <span className={`text-lg font-bold ${entry.cgpa >= 9 ? 'text-yellow-500' :
                                                     entry.cgpa >= 8 ? 'text-rose-500' :
-                                                    entry.cgpa >= 7 ? 'text-purple-500' :
-                                                    'text-(--text-primary)'
-                                                }`}>
+                                                        entry.cgpa >= 7 ? 'text-purple-500' :
+                                                            'text-(--text-primary)'
+                                                    }`}>
                                                     {entry.cgpa.toFixed(2)}
                                                 </span>
                                             </td>

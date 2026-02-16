@@ -404,8 +404,8 @@ export default function OnboardingPage() {
             // Consent logging is handled automatically by the database trigger (trg_consent_audit)
             // when the student record is updated above. No manual inserts needed.
 
-            // Insert all academic records and subjects
-            for (const semData of semesterResults) {
+            // Insert all academic records and subjects (all semesters in parallel)
+            await Promise.all(semesterResults.map(async (semData) => {
                 // Create academic record
                 const { data: record, error: recordError } = await supabase
                     .from('academic_records')
@@ -418,7 +418,7 @@ export default function OnboardingPage() {
 
                 if (recordError) {
                     console.error('Record error:', recordError);
-                    continue; // Skip this semester but continue with others
+                    return; // Skip this semester but continue with others
                 }
 
                 // Insert subjects for this semester
@@ -448,24 +448,18 @@ export default function OnboardingPage() {
 
                     // Priority 3: Estimate based on marks structure
                     if (credits === 0) {
-                        // Estimate credits:
-                        // - If has internal marks > 20, likely theory (4 credits)
-                        // - If internal marks <= 20 or no internal, likely lab (2 credits)
                         credits = 4; // Default for theory
                         if (internalMarks === 0 || (internalMarks <= 20 && totalMarks <= 50)) {
                             credits = 2; // Lab/Practical
                         }
                     }
 
-                    // Use actual mark totals as max values (no hardcoded constraints)
-                    // This allows flexible schemes where subjects may have different mark distributions
                     const clampedInternal = Math.max(internalMarks, 0);
                     const clampedExternal = Math.max(externalMarks, 0);
                     const clampedCredits = Math.min(Math.max(credits, 1), 10);
-                    
-                    // Calculate actual maximums from the data
-                    const maxInternal = clampedInternal > 0 ? clampedInternal : 40; // fallback only
-                    const maxExternal = clampedExternal > 0 ? clampedExternal : 60; // fallback only
+
+                    const maxInternal = clampedInternal > 0 ? clampedInternal : 40;
+                    const maxExternal = clampedExternal > 0 ? clampedExternal : 60;
 
                     return {
                         record_id: record.id,
@@ -485,7 +479,7 @@ export default function OnboardingPage() {
                 if (subjectsError) {
                     console.error('Subjects insert error:', subjectsError);
                 }
-            }
+            }));
 
             // Redirect to dashboard
             router.refresh();
@@ -748,14 +742,12 @@ export default function OnboardingPage() {
                                         role="switch"
                                         aria-checked={consentAnalytics}
                                         onClick={() => setConsentAnalytics(!consentAnalytics)}
-                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${
-                                            consentAnalytics ? 'bg-rose-500' : 'bg-(--card-border)'
-                                        }`}
+                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${consentAnalytics ? 'bg-rose-500' : 'bg-(--card-border)'
+                                            }`}
                                     >
                                         <span
-                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                consentAnalytics ? 'translate-x-5' : 'translate-x-0'
-                                            }`}
+                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${consentAnalytics ? 'translate-x-5' : 'translate-x-0'
+                                                }`}
                                         />
                                     </button>
                                 </div>
@@ -775,14 +767,12 @@ export default function OnboardingPage() {
                                         role="switch"
                                         aria-checked={consentRankboard}
                                         onClick={() => setConsentRankboard(!consentRankboard)}
-                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${
-                                            consentRankboard ? 'bg-rose-500' : 'bg-(--card-border)'
-                                        }`}
+                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${consentRankboard ? 'bg-rose-500' : 'bg-(--card-border)'
+                                            }`}
                                     >
                                         <span
-                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                consentRankboard ? 'translate-x-5' : 'translate-x-0'
-                                            }`}
+                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${consentRankboard ? 'translate-x-5' : 'translate-x-0'
+                                                }`}
                                         />
                                     </button>
                                 </div>
@@ -802,14 +792,12 @@ export default function OnboardingPage() {
                                         role="switch"
                                         aria-checked={consentMarksVisibility}
                                         onClick={() => setConsentMarksVisibility(!consentMarksVisibility)}
-                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${
-                                            consentMarksVisibility ? 'bg-rose-500' : 'bg-(--card-border)'
-                                        }`}
+                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-background ${consentMarksVisibility ? 'bg-rose-500' : 'bg-(--card-border)'
+                                            }`}
                                     >
                                         <span
-                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                consentMarksVisibility ? 'translate-x-5' : 'translate-x-0'
-                                            }`}
+                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${consentMarksVisibility ? 'translate-x-5' : 'translate-x-0'
+                                                }`}
                                         />
                                     </button>
                                 </div>
@@ -876,11 +864,10 @@ export default function OnboardingPage() {
                                         role="checkbox"
                                         aria-checked={acknowledgeVoluntary}
                                         onClick={() => setAcknowledgeVoluntary(!acknowledgeVoluntary)}
-                                        className={`mt-0.5 shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${
-                                            acknowledgeVoluntary
+                                        className={`mt-0.5 shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${acknowledgeVoluntary
                                                 ? 'bg-rose-500 border-rose-500'
                                                 : 'bg-transparent border-(--text-secondary) hover:border-rose-500'
-                                        }`}
+                                            }`}
                                     >
                                         {acknowledgeVoluntary && (
                                             <CheckCircle2 className="w-3.5 h-3.5 text-white" />

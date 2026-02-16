@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser, getStudentProfile, getAcademicRecords } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { AcademicRecord, Subject } from '@/types';
@@ -22,35 +22,21 @@ interface RecordWithSubjects extends AcademicRecord {
 }
 
 export default async function DashboardPage() {
-    const supabase = await createClient();
-
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect('/');
     }
 
-    // Get student profile
-    const { data: student, error: studentError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Fetch student profile and academic records in parallel
+    const [{ data: student, error: studentError }, records] = await Promise.all([
+        getStudentProfile(user.id),
+        getAcademicRecords(user.id),
+    ]);
 
     if (studentError || !student) {
         redirect('/onboarding');
     }
-
-    // Get academic records with subjects
-    const { data: records } = await supabase
-        .from('academic_records')
-        .select(`
-      *,
-      subjects (*)
-    `)
-        .eq('student_id', user.id)
-        .order('semester', { ascending: true });
 
     return (
         <Suspense

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser, getStudentProfile, createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { RankboardEntry } from '@/types';
@@ -16,20 +16,14 @@ const RankboardClient = dynamic(() => import('./RankboardClient').then(mod => ({
 });
 
 export default async function RankboardPage() {
-    const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect('/');
     }
 
-    // Get current user's profile
-    const { data: student } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Get current user's profile (cached)
+    const { data: student } = await getStudentProfile(user.id);
 
     if (!student) {
         redirect('/onboarding');
@@ -39,6 +33,7 @@ export default async function RankboardPage() {
     let rankboardData: RankboardEntry[] = [];
 
     if (student.consent_rankboard && student.consent_analytics) {
+        const supabase = await createClient();
         const { data: rankedStudents } = await supabase.rpc('get_rankboard');
         if (rankedStudents) {
             rankboardData = rankedStudents as RankboardEntry[];

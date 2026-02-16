@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser, getStudentProfile, createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { Subject } from '@/types';
@@ -30,20 +30,14 @@ interface PageProps {
 
 export default async function PeerDashboardPage({ params }: PageProps) {
     const { id: peerId } = await params;
-    const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect('/');
     }
 
-    // Get current user's profile
-    const { data: currentStudent } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Get current user's profile (cached)
+    const { data: currentStudent } = await getStudentProfile(user.id);
 
     if (!currentStudent) {
         redirect('/onboarding');
@@ -54,16 +48,17 @@ export default async function PeerDashboardPage({ params }: PageProps) {
         redirect('/peers');
     }
 
-    // Get the peer's profile (mutual consent + marks visibility enforced in RPC)
-    const { data: peerProfile } = await supabase.rpc('get_peer_profile', { peer_id: peerId });
+    // Fetch peer profile and subjects in parallel
+    const supabase = await createClient();
+    const [{ data: peerProfile }, { data: subjectRows }] = await Promise.all([
+        supabase.rpc('get_peer_profile', { peer_id: peerId }),
+        supabase.rpc('get_peer_subjects', { peer_id: peerId }),
+    ]);
     const peerStudent = peerProfile?.[0];
 
     if (!peerStudent) {
         notFound();
     }
-
-    // Get the peer's subjects (mutual consent + marks visibility enforced in RPC)
-    const { data: subjectRows } = await supabase.rpc('get_peer_subjects', { peer_id: peerId });
 
     const recordsMap = new Map<number, RecordWithSubjects>();
     (subjectRows || []).forEach((row: any) => {

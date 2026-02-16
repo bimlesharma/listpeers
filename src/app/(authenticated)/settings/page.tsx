@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser, getStudentProfile, getAcademicRecords, createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { AcademicRecord, Subject } from '@/types';
@@ -22,42 +22,28 @@ interface RecordWithSubjects extends AcademicRecord {
 }
 
 export default async function SettingsPage() {
-    const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
         redirect('/');
     }
 
-    // Get student profile
-    const { data: student, error: studentError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Fetch profile, records, and consent logs in parallel
+    const supabase = await createClient();
+    const [{ data: student, error: studentError }, records, { data: consentLogs }] = await Promise.all([
+        getStudentProfile(user.id),
+        getAcademicRecords(user.id),
+        supabase
+            .from('consent_log')
+            .select('*')
+            .eq('student_id', user.id)
+            .order('logged_at', { ascending: false })
+            .limit(10),
+    ]);
 
     if (studentError || !student) {
         redirect('/onboarding');
     }
-
-    // Get academic records for export
-    const { data: records } = await supabase
-        .from('academic_records')
-        .select(`
-      *,
-      subjects (*)
-    `)
-        .eq('student_id', user.id)
-        .order('semester', { ascending: true });
-
-    // Get consent logs
-    const { data: consentLogs } = await supabase
-        .from('consent_log')
-        .select('*')
-        .eq('student_id', user.id)
-        .order('logged_at', { ascending: false })
-        .limit(10);
 
     return (
         <SettingsClient
