@@ -18,6 +18,7 @@ import {
     ArrowRight,
     Download,
     LogOut,
+    ServerCrash,
 } from 'lucide-react';
 
 type Step = 'ipu-login' | 'fetching' | 'review' | 'consent';
@@ -64,6 +65,7 @@ export default function OnboardingPage() {
     const [loading, setLoading] = useState(false);
     const [checkingProfile, setCheckingProfile] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [captchaFailed, setCaptchaFailed] = useState(false);
     const [fetchProgress, setFetchProgress] = useState('');
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -156,6 +158,7 @@ export default function OnboardingPage() {
     const fetchCaptcha = useCallback(async () => {
         setLoading(true);
         setError(null);
+        setCaptchaFailed(false);
         try {
             const res = await fetch('/api/ipu/captcha');
             const data: CaptchaResponse = await res.json();
@@ -163,11 +166,18 @@ export default function OnboardingPage() {
                 setCaptchaImage(data.captchaImage);
                 setSessionId(data.sessionId);
                 setCaptchaInput('');
+                setCaptchaFailed(false);
             } else {
+                setCaptchaImage('');
+                if (data.serverError) {
+                    setCaptchaFailed(true);
+                }
                 setError(data.message || 'Failed to load captcha');
             }
         } catch {
-            setError('Failed to connect to IPU server. Please try again.');
+            setCaptchaImage('');
+            setCaptchaFailed(true);
+            setError('The IPU server is currently unreachable. This is usually a temporary issue on their end. Please try again after some time.');
         } finally {
             setLoading(false);
         }
@@ -595,6 +605,11 @@ export default function OnboardingPage() {
                                             alt="Captcha"
                                             className="h-10 rounded border border-(--card-border)"
                                         />
+                                    ) : captchaFailed ? (
+                                        <div className="h-10 px-3 bg-amber-500/10 rounded border border-amber-500/30 flex items-center gap-2">
+                                            <ServerCrash className="w-4 h-4 shrink-0 text-amber-500" />
+                                            <span className="text-xs text-amber-600 dark:text-amber-400">IPU Server Unavailable</span>
+                                        </div>
                                     ) : (
                                         <div className="h-10 w-24 bg-secondary rounded border border-(--card-border) flex items-center justify-center">
                                             <Loader2 className="w-4 h-4 animate-spin text-(--text-secondary)" />
@@ -610,6 +625,25 @@ export default function OnboardingPage() {
                                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                                     </button>
                                 </div>
+                                {captchaFailed && (
+                                    <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-2">
+                                        <AlertCircle className="w-4 h-4 shrink-0 text-amber-500 mt-0.5" />
+                                        <div>
+                                            <p className="text-xs text-amber-700 dark:text-amber-300">
+                                                The IPU server is currently down or not responding. This is a temporary issue on their end and is not related to ListPeers.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={fetchCaptcha}
+                                                disabled={loading}
+                                                className="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+                                            >
+                                                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                                                Try again
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                                 <input
                                     type="text"
                                     value={captchaInput}
@@ -865,8 +899,8 @@ export default function OnboardingPage() {
                                         aria-checked={acknowledgeVoluntary}
                                         onClick={() => setAcknowledgeVoluntary(!acknowledgeVoluntary)}
                                         className={`mt-0.5 shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${acknowledgeVoluntary
-                                                ? 'bg-rose-500 border-rose-500'
-                                                : 'bg-transparent border-(--text-secondary) hover:border-rose-500'
+                                            ? 'bg-rose-500 border-rose-500'
+                                            : 'bg-transparent border-(--text-secondary) hover:border-rose-500'
                                             }`}
                                     >
                                         {acknowledgeVoluntary && (

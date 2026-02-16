@@ -47,8 +47,8 @@ export async function GET() {
 
         if (!response.ok) {
             return NextResponse.json(
-                { success: false, message: 'Failed to fetch captcha' },
-                { status: 500 }
+                { success: false, message: 'The IPU server returned an error. The server may be undergoing maintenance or experiencing issues. Please try again later.', serverError: true },
+                { status: 502 }
             );
         }
 
@@ -79,9 +79,13 @@ export async function GET() {
         });
     } catch (error) {
         console.error('Captcha fetch error:', error);
+        const isTimeout = error instanceof Error && (error.message.includes('timeout') || error.message.includes('ETIMEDOUT') || error.message.includes('ECONNREFUSED') || error.message.includes('ECONNRESET') || error.message.includes('ENOTFOUND'));
+        const message = isTimeout
+            ? 'Unable to reach the IPU server. The server may be down or temporarily unavailable. Please try again after some time.'
+            : 'Unable to connect to the IPU server. Please check your connection and try again.';
         return NextResponse.json(
-            { success: false, message: 'Failed to fetch captcha' },
-            { status: 500 }
+            { success: false, message, serverError: true },
+            { status: 502 }
         );
     }
 }

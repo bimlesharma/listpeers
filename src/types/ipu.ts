@@ -29,6 +29,7 @@ export interface CaptchaResponse {
     captchaImage?: string;
     sessionId?: string;
     message?: string;
+    serverError?: boolean;
 }
 
 export interface LoginResponse {
