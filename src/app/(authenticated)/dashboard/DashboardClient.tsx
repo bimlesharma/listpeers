@@ -87,10 +87,10 @@ export function DashboardClient({ student, records, consentAnalytics = false }: 
     const gradeDistribution = getGradeDistribution(allSubjects);
     const totalCredits = processed.reduce((sum, p) => sum + p.totalCredits, 0);
     
-    // Calculate backlogs (failed subjects - grade 'F' or total_marks < 40)
+    // Calculate backlogs (failed subjects with grade 'F')
     const backlogs = allSubjects.filter(subject => {
         const grade = subject.grade || marksToGrade(subject.total_marks);
-        return grade === 'F' || subject.total_marks < 40;
+        return grade === 'F';
     }).length;
 
     // Student info from profile
