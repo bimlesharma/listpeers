@@ -1,7 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { IPUResult } from '@/types/ipu';
+import { getSessionCookie } from '../captcha/route';
 
 const IPU_BASE_URL = 'https://examweb.ggsipu.ac.in/web';
+
+interface IPUResultsErrorResponse {
+    status?: string;
+    message?: string;
+}
+
+interface IPUStudentProfile {
+    nrollno?: string;
+    stname?: string;
+    byoa?: number | string;
+    yoa?: number | string;
+    prgname?: string;
+    iname?: string;
+}
+
+type IPUResultRow = [
+    number | string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+];
+
+interface IPUNewResultsResponse {
+    report?: string;
+    stprofile?: IPUStudentProfile;
+    header?: string[];
+    stresult?: IPUResultRow[];
+}
+
+function isNewIPUResultsResponse(data: unknown): data is IPUNewResultsResponse {
+    return !!data && typeof data === 'object' && Array.isArray((data as IPUNewResultsResponse).stresult);
+}
+
+function isIPUResultsErrorResponse(data: unknown): data is IPUResultsErrorResponse {
+    return !!data && typeof data === 'object' && 'message' in data;
+}
+
+function normalizeIPUResults(data: IPUNewResultsResponse): IPUResult[] {
+    const profile = data.stprofile ?? {};
+    const rows = Array.isArray(data.stresult) ? data.stresult : [];
+
+    return rows.map((row) => {
+        const [semester, paperCode, subjectName, internal, external, total, status, , declaredDate] = row;
+
+        return {
+            stname: profile.stname || '',
+            nrollno: profile.nrollno || '',
+            iname: profile.iname || '',
+            instname: profile.iname || '',
+            prgname: profile.prgname || '',
+            progname: profile.prgname || '',
+            batch: profile.byoa ? String(profile.byoa) : undefined,
+            yoa: profile.yoa ? String(profile.yoa) : undefined,
+            byoa: profile.byoa ? String(profile.byoa) : undefined,
+            papercode: paperCode || '',
+            papername: subjectName || '',
+            minorprint: internal || '0',
+            majorprint: external || '0',
+            moderatedprint: total || '0',
+            eugpa: status || '',
+            declareddate: declaredDate || '',
+            euno: semester,
+        };
+    });
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -17,12 +88,14 @@ export async function GET(request: NextRequest) {
         }
 
         // Fetch results from IPU API
+        const sessionCookie = getSessionCookie(sessionId) || `JSESSIONID=${sessionId}`;
+
         const response = await fetch(
             `${IPU_BASE_URL}/StudentSearchProcess?flag=2&euno=${semester}`,
             {
                 method: 'GET',
                 headers: {
-                    'Cookie': `JSESSIONID=${sessionId}`,
+                    'Cookie': sessionCookie,
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept': 'application/json, text/plain, */*',
                     'Referer': 'https://examweb.ggsipu.ac.in/web/student/studenthome.jsp',
@@ -55,7 +128,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Try to parse as JSON
-        let data: IPUResult[];
+        let data: IPUResult[] | IPUResultsErrorResponse | IPUNewResultsResponse;
         try {
             data = JSON.parse(responseText);
         } catch {
@@ -65,8 +138,33 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // If no data or empty array
-        if (!data || !Array.isArray(data) || data.length === 0) {
+        if (!data) {
+            return NextResponse.json(
+                { success: false, message: 'Empty response from server.' },
+                { status: 502 }
+            );
+        }
+
+        if (!Array.isArray(data) && isNewIPUResultsResponse(data)) {
+            data = normalizeIPUResults(data);
+        }
+
+        if (!Array.isArray(data)) {
+            const message = isIPUResultsErrorResponse(data)
+                ? data.message || 'Unexpected response from results server.'
+                : 'Unexpected response from results server.';
+            const isSessionError = /session expired|log in again|login again/i.test(message);
+
+            console.error('Unexpected IPU results response shape:', data);
+
+            return NextResponse.json(
+                { success: false, message },
+                { status: isSessionError ? 401 : 502 }
+            );
+        }
+
+        // If empty array, the login is valid but there are no declared results.
+        if (data.length === 0) {
             return NextResponse.json({
                 success: true,
                 results: [],

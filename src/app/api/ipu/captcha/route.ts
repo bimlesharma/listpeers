@@ -30,6 +30,39 @@ export function getSessionCookie(sessionId: string): string | undefined {
     return undefined;
 }
 
+function extractCookieHeader(setCookieHeader: string): string {
+    return setCookieHeader
+        .split(/,(?=[^;]+=)/)
+        .map((cookiePart) => cookiePart.split(';', 1)[0].trim())
+        .filter(Boolean)
+        .join('; ');
+}
+
+export function storeSessionCookie(sessionId: string, cookie: string) {
+    if (!sessionId || !cookie) {
+        return;
+    }
+
+    sessionStore.set(sessionId, {
+        cookie,
+        expiresAt: Date.now() + SESSION_TTL_MS,
+    });
+}
+
+export function updateSessionCookie(previousSessionId: string, setCookieHeader: string): string {
+    const cookie = extractCookieHeader(setCookieHeader);
+    const match = cookie.match(/JSESSIONID=([^;]+)/);
+    const nextSessionId = match?.[1] || previousSessionId;
+
+    storeSessionCookie(nextSessionId, cookie);
+
+    if (previousSessionId && previousSessionId !== nextSessionId) {
+        sessionStore.delete(previousSessionId);
+    }
+
+    return nextSessionId;
+}
+
 export async function GET() {
     try {
         // Clean up expired sessions before processing
@@ -60,10 +93,7 @@ export async function GET() {
             const match = setCookie.match(/JSESSIONID=([^;]+)/);
             if (match) {
                 sessionId = match[1];
-                sessionStore.set(sessionId, {
-                    cookie: setCookie,
-                    expiresAt: Date.now() + SESSION_TTL_MS
-                });
+                storeSessionCookie(sessionId, extractCookieHeader(setCookie));
             }
         }
 

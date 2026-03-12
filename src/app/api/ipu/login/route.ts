@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionCookie, updateSessionCookie } from '../captcha/route';
 
 const IPU_BASE_URL = 'https://examweb.ggsipu.ac.in/web';
 
@@ -19,12 +20,14 @@ export async function POST(request: NextRequest) {
         formData.append('passwd', hashedPassword);
         formData.append('captcha', captcha);
 
+        const sessionCookie = getSessionCookie(sessionId) || `JSESSIONID=${sessionId}`;
+
         // Send login request to IPU server
         const response = await fetch(`${IPU_BASE_URL}/Login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Cookie': `JSESSIONID=${sessionId}`,
+                'Cookie': sessionCookie,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             },
             body: formData.toString(),
@@ -36,19 +39,15 @@ export async function POST(request: NextRequest) {
         let newSessionId = sessionId;
 
         if (setCookie) {
-            const match = setCookie.match(/JSESSIONID=([^;]+)/);
-            if (match) {
-                newSessionId = match[1];
-            }
+            newSessionId = updateSessionCookie(sessionId, setCookie);
         }
 
         // Check if login was successful (redirect to studenthome.jsp)
         const location = response.headers.get('location');
         const responseText = await response.text();
 
-        // Success is indicated by redirect to student home
+        // Success is indicated by landing on the student home page.
         if ((location && location.includes('studenthome')) ||
-            response.status === 302 ||
             responseText.includes('studenthome')) {
 
             return NextResponse.json({
@@ -70,6 +69,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 success: false,
                 message: 'Invalid username or password.',
+            });
+        }
+
+        if (responseText.includes('No session exist') || responseText.includes('Session Expired')) {
+            return NextResponse.json({
+                success: false,
+                message: 'Session expired. Please refresh the captcha and try again.',
             });
         }
 

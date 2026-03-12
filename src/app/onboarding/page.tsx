@@ -243,8 +243,15 @@ export default function OnboardingPage() {
             const res = await fetch(`/api/ipu/results?sessionId=${session}&semester=100`);
             const data: IPUResultsResponse = await res.json();
 
-            if (!data.success || !data.results || data.results.length === 0) {
-                setError('No results found for this enrollment number. Please ensure you have declared results.');
+            if (!data.success) {
+                setError(data.message || 'Failed to fetch results. Please try again.');
+                setStep('ipu-login');
+                fetchCaptcha();
+                return;
+            }
+
+            if (!data.results || data.results.length === 0) {
+                setError(data.message || 'No results found for this enrollment number. Please ensure you have declared results.');
                 setStep('ipu-login');
                 fetchCaptcha();
                 return;
