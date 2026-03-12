@@ -33,6 +33,13 @@ type EnrollmentLookup = {
     email: string | null;
 };
 
+type ProfileStatusResponse = {
+    status?: 'profile-exists' | 'email-linked-profile' | 'needs-onboarding';
+    maskedEmail?: string | null;
+    enrollmentNo?: string | null;
+    college?: string | null;
+};
+
 export default function OnboardingPage() {
     const router = useRouter();
     const supabase = createClient();
@@ -68,6 +75,7 @@ export default function OnboardingPage() {
     const [captchaFailed, setCaptchaFailed] = useState(false);
     const [fetchProgress, setFetchProgress] = useState('');
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [accountConflictMessage, setAccountConflictMessage] = useState<string | null>(null);
 
     const maskEmail = (email?: string | null) => {
         if (!email || !email.includes('@')) {
@@ -79,6 +87,16 @@ export default function OnboardingPage() {
         const maskedLocal = `${visibleLocal}${'*'.repeat(Math.max(local.length - visibleLocal.length, 1))}`;
         return `${maskedLocal}@${domain}`;
     };
+
+    const setExistingAccountConflict = useCallback((linkedEmail?: string | null) => {
+        const linkedAccount = linkedEmail || 'the original GitHub account used for ListPeers';
+        setAccountConflictMessage(
+            `This enrollment is already linked to ${linkedAccount}. Sign out and log back in with that GitHub account to access your existing profile. If you want to move to a different GitHub account, delete the old account first from Settings and then re-register.`
+        );
+        setStep('ipu-login');
+        setLoading(false);
+        setFetchProgress('');
+    }, []);
 
     const fetchLinkedEmail = useCallback(
         async (enrollment: string, college: string | null) => {
@@ -135,6 +153,39 @@ export default function OnboardingPage() {
                 return;
             }
 
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
+            if (token) {
+                try {
+                    const res = await fetch('/api/auth/profile-status', {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (res.ok) {
+                        const profileStatus = await res.json() as ProfileStatusResponse;
+
+                        if (profileStatus.status === 'profile-exists') {
+                            router.replace('/dashboard');
+                            return;
+                        }
+
+                        if (profileStatus.status === 'email-linked-profile') {
+                            const linkedAccount = profileStatus.maskedEmail || maskEmail(user.email);
+                            setAccountConflictMessage(
+                                `This GitHub sign-in is not mapped to your existing ListPeers profile. Your profile is already linked to ${linkedAccount}. Sign out and log back in with the original GitHub account used for ListPeers.`
+                            );
+                            setCheckingProfile(false);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Profile status check failed:', err);
+                }
+            }
+
             // Check if profile exists by user ID (simpler query to avoid RLS issues)
             const { data: existingProfile } = await supabase
                 .from('students')
@@ -184,10 +235,10 @@ export default function OnboardingPage() {
     }, []);
 
     useEffect(() => {
-        if (!checkingProfile && step === 'ipu-login') {
+        if (!checkingProfile && !accountConflictMessage && step === 'ipu-login') {
             fetchCaptcha();
         }
-    }, [checkingProfile, step, fetchCaptcha]);
+    }, [accountConflictMessage, checkingProfile, step, fetchCaptcha]);
 
     // Handle IPU login
     const handleIPULogin = async (e: React.FormEvent) => {
@@ -236,6 +287,7 @@ export default function OnboardingPage() {
     const fetchAllResults = async (session: string) => {
         setLoading(true);
         setError(null);
+        setAccountConflictMessage(null);
         setFetchProgress('Fetching all semester results...');
 
         try {
@@ -263,6 +315,15 @@ export default function OnboardingPage() {
             setStudentInstitute(firstResult.instname || firstResult.iname || '');
             setStudentProgram(firstResult.progname || firstResult.prgname || '');
             setStudentBatch(firstResult.batch || firstResult.yoa || '');
+
+            const normalizedEnrollment = enrollmentNo.trim().toUpperCase();
+            const normalizedCollege = (firstResult.instname || firstResult.iname || '').trim() || null;
+            const linkedEmail = await fetchLinkedEmail(normalizedEnrollment, normalizedCollege);
+
+            if (linkedEmail) {
+                setExistingAccountConflict(linkedEmail);
+                return;
+            }
 
             // Group results by semester
             const semesterMap = new Map<number, IPUResult[]>();
@@ -543,16 +604,26 @@ export default function OnboardingPage() {
                             <h1 className="text-2xl font-bold text-gradient">ListPeers</h1>
                         </div>
                         <h2 className="text-xl font-semibold text-(--text-primary)">
-                            {step === 'ipu-login' && 'Verify Your Identity'}
-                            {step === 'fetching' && 'Fetching Your Results'}
-                            {step === 'review' && 'Review Your Data'}
-                            {step === 'consent' && 'Privacy Settings'}
+                            {accountConflictMessage
+                                ? 'Existing Account Detected'
+                                : step === 'ipu-login'
+                                    ? 'Verify Your Identity'
+                                    : step === 'fetching'
+                                        ? 'Fetching Your Results'
+                                        : step === 'review'
+                                            ? 'Review Your Data'
+                                            : 'Privacy Settings'}
                         </h2>
                         <p className="text-(--text-secondary) mt-2">
-                            {step === 'ipu-login' && 'Login with your official IPU portal credentials'}
-                            {step === 'fetching' && 'Please wait while we fetch your academic records'}
-                            {step === 'review' && 'Confirm your academic data before proceeding'}
-                            {step === 'consent' && 'Configure your privacy preferences'}
+                            {accountConflictMessage
+                                ? 'This sign-in does not match the ListPeers account that already owns your profile'
+                                : step === 'ipu-login'
+                                    ? 'Login with your official IPU portal credentials'
+                                    : step === 'fetching'
+                                        ? 'Please wait while we fetch your academic records'
+                                        : step === 'review'
+                                            ? 'Confirm your academic data before proceeding'
+                                            : 'Configure your privacy preferences'}
                         </p>
                     </div>
 
@@ -563,8 +634,36 @@ export default function OnboardingPage() {
                         </div>
                     )}
 
+                    {accountConflictMessage && (
+                        <div className="card p-6 space-y-4 animate-fade-in-up stagger-1">
+                            <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                                <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+                                <p className="text-sm text-(--text-primary)">{accountConflictMessage}</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                disabled={isLoggingOut}
+                                className="btn-primary w-full flex items-center justify-center gap-2"
+                            >
+                                {isLoggingOut ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Signing out...
+                                    </>
+                                ) : (
+                                    <>
+                                        <LogOut className="w-4 h-4" />
+                                        Sign Out
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
                     {/* Step 1: IPU Login */}
-                    {step === 'ipu-login' && (
+                    {!accountConflictMessage && step === 'ipu-login' && (
                         <form onSubmit={handleIPULogin} className="card p-6 space-y-4 animate-fade-in-up stagger-1">
                             <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
                                 <ShieldCheck className="w-5 h-5 shrink-0 text-rose-500" />
